@@ -253,6 +253,57 @@
         </div>
       </section>
 
+      <!-- Affirmation Wallpaper -->
+      <section id="tab-wallpaper" class="tab-page">
+        <h2 class="page-title">Affirmation Wallpaper</h2>
+        <p class="page-sub">Design a wallpaper with your affirmation — export it, then set it on your phone or desktop.</p>
+
+        <div class="card glass form-card">
+          <label class="field-label">1 · Background</label>
+          <div class="wp-bgs" id="wpBgs"></div>
+          <label class="field-label">or your own photo</label>
+          <input type="file" id="wpPhoto" accept="image/*" class="hidden">
+          <div class="ai-drop" id="wpDrop"><span>🖼</span><span>Tap to upload your photo</span></div>
+          <div id="wpPrevBox" class="ai-prev hidden"><img id="wpPrevImg" alt="your photo"><button id="wpPrevClear" class="chip" type="button">Remove photo</button></div>
+        </div>
+
+        <div class="card glass form-card">
+          <label class="field-label">2 · Your affirmation</label>
+          <textarea id="wpText" rows="2" maxlength="120" placeholder="I am becoming who I am meant to be"></textarea>
+          <button id="wpShuffle" class="chip" type="button">✦ Shuffle affirmation</button>
+        </div>
+
+        <div class="card glass form-card">
+          <label class="field-label">3 · Style</label>
+          <div class="chips">
+            <button class="chip wp-ratio active" data-ratio="phone">📱 Phone 9:16</button>
+            <button class="chip wp-ratio" data-ratio="desktop">💻 Desktop 16:9</button>
+          </div>
+          <div class="chips">
+            <button class="chip wp-pos active" data-pos="center">Center</button>
+            <button class="chip wp-pos" data-pos="top">Top</button>
+            <button class="chip wp-pos" data-pos="bottom">Bottom</button>
+          </div>
+          <div class="chips">
+            <button class="chip wp-tone active" data-tone="light">Light text</button>
+            <button class="chip wp-tone" data-tone="dark">Dark text</button>
+          </div>
+          <div class="wp-size">
+            <label>Text size</label>
+            <input type="range" id="wpSize" min="26" max="80" value="48">
+          </div>
+        </div>
+
+        <div class="card glass form-card">
+          <canvas id="wpCanvas" class="wp-canvas"></canvas>
+          <button id="wpExport" class="btn-primary">⬇ Download Wallpaper</button>
+          <div id="wpGuide" class="wp-guide hidden">
+            <p class="wp-guide-t"><b>Set it as your wallpaper:</b></p>
+            <p id="wpGuideText" class="wp-guide-b"></p>
+          </div>
+        </div>
+      </section>
+
       <!-- More / Practice Hub -->
       <section id="tab-more" class="tab-page">
         <h2 class="page-title">Your Practice</h2>
@@ -262,6 +313,11 @@
             <span class="mc-ico">🎬</span>
             <span class="mc-title">AI Vision</span>
             <span class="mc-desc">See &amp; become your future self</span>
+          </div>
+          <div class="more-card" data-goto="tab-wallpaper">
+            <span class="mc-ico">🖼</span>
+            <span class="mc-title">Wallpaper</span>
+            <span class="mc-desc">Affirmation wallpapers</span>
           </div>
           <div class="more-card" data-goto="tab-goals">
             <span class="mc-ico">☆</span>

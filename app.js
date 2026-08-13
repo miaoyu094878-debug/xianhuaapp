@@ -757,6 +757,233 @@
   renderAiResults();
   $('#aiKeyState').textContent = aiKeyStateTxt();
 
+  /* ═══════ Affirmation Wallpaper ═══════ */
+  var WP_QUOTES = [
+    'I am becoming who I am meant to be',
+    'Everything I desire is already on its way',
+    'I am worthy of my wildest dreams',
+    'Abundance flows to me with ease',
+    'I trust the timing of my life',
+    'Today I choose peace and clarity',
+    'I am aligned with the universe',
+    'My energy attracts my desires',
+    'I release what no longer serves me',
+    'Every breath renews my power',
+    'I am grateful for this beautiful life',
+    'I am enough, exactly as I am',
+    'Magic happens when I believe',
+    'I radiate confidence and love',
+    'My future self is proud of me',
+    'I open my heart to endless possibilities'
+  ];
+  var wpState = { preset: 0, ratio: 'phone', pos: 'center', tone: 'light', size: 48, photo: null };
+  var WP_RATIOS = { phone: { w: 1080, h: 1920 }, desktop: { w: 1920, h: 1080 } };
+
+  function blob(c, x, y, r, col) {
+    var g = c.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+  }
+  function stars(c, w, h, n) {
+    for (var i = 0; i < n; i++) {
+      c.fillStyle = 'rgba(255,255,255,' + (Math.random() * 0.7 + 0.25) + ')';
+      c.beginPath(); c.arc(Math.random() * w, Math.random() * h, Math.random() * 2 + 0.5, 0, Math.PI * 2); c.fill();
+    }
+  }
+  var WP_PRESETS = [
+    function (c, w, h) {
+      var g = c.createLinearGradient(0, 0, w, h);
+      g.addColorStop(0, '#f3e8ff'); g.addColorStop(0.5, '#ffe3f1'); g.addColorStop(1, '#e8d5ff');
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+      blob(c, w * 0.75, h * 0.2, w * 0.6, 'rgba(160,120,230,0.35)');
+      blob(c, w * 0.15, h * 0.8, w * 0.55, 'rgba(240,150,190,0.35)');
+    },
+    function (c, w, h) {
+      var g = c.createLinearGradient(0, 0, w, h);
+      g.addColorStop(0, '#0b0014'); g.addColorStop(1, '#1b0b33');
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+      blob(c, w * 0.7, h * 0.25, w * 0.5, 'rgba(150,110,230,0.4)');
+      stars(c, w, h, 130);
+    },
+    function (c, w, h) {
+      var g = c.createLinearGradient(0, h, 0, 0);
+      g.addColorStop(0, '#061c3a'); g.addColorStop(1, '#0a0f2e');
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+      blob(c, w * 0.3, h * 0.35, w * 0.8, 'rgba(60,220,190,0.30)');
+      blob(c, w * 0.75, h * 0.5, w * 0.6, 'rgba(130,90,230,0.35)');
+      stars(c, w, h, 60);
+    },
+    function (c, w, h) {
+      var g = c.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, '#fff3d6'); g.addColorStop(1, '#ffd9a0');
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+      blob(c, w * 0.5, h * 0.75, w * 0.7, 'rgba(255,190,120,0.5)');
+    },
+    function (c, w, h) {
+      var g = c.createLinearGradient(0, 0, w, h);
+      g.addColorStop(0, '#eafff6'); g.addColorStop(1, '#d7f5ea');
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+      blob(c, w * 0.8, h * 0.25, w * 0.5, 'rgba(120,220,190,0.35)');
+      blob(c, w * 0.2, h * 0.8, w * 0.4, 'rgba(190,240,220,0.5)');
+    },
+    function (c, w, h) {
+      var g = c.createLinearGradient(0, 0, w, h);
+      g.addColorStop(0, '#160a26'); g.addColorStop(1, '#3a1030');
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+      blob(c, w * 0.5, h * 0.6, w * 0.6, 'rgba(255,170,190,0.28)');
+      blob(c, w * 0.25, h * 0.25, w * 0.4, 'rgba(240,190,120,0.25)');
+      stars(c, w, h, 90);
+    }
+  ];
+
+  function wpThumb(preset) {
+    var cnv = document.createElement('canvas'); cnv.width = 180; cnv.height = 320;
+    WP_PRESETS[preset](cnv.getContext('2d'), 180, 320);
+    return cnv;
+  }
+  function renderWpPresets() {
+    var wrap = $('#wpBgs'); wrap.innerHTML = '';
+    WP_PRESETS.forEach(function (p, i) {
+      var btn = document.createElement('button');
+      btn.className = 'wp-bg' + (wpState.preset === i ? ' active' : '');
+      btn.type = 'button'; btn.dataset.preset = i;
+      btn.appendChild(wpThumb(i));
+      btn.addEventListener('click', function () {
+        wpState.preset = i; wpState.photo = null;
+        $('#wpPrevBox').classList.add('hidden'); $('#wpPhoto').value = '';
+        $$('.wp-bg').forEach(function (b) { b.classList.toggle('active', +b.dataset.preset === i); });
+        renderWallpaper();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  $('#wpDrop').addEventListener('click', function () { $('#wpPhoto').click(); });
+  $('#wpPhoto').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    compressImage(f, function (data) {
+      if (!data) return;
+      wpState.photo = data;
+      $('#wpPrevImg').src = data;
+      $('#wpPrevBox').classList.remove('hidden');
+      $$('.wp-bg').forEach(function (b) { b.classList.remove('active'); });
+      renderWallpaper();
+    });
+  });
+  $('#wpPrevClear').addEventListener('click', function () {
+    wpState.photo = null; $('#wpPrevBox').classList.add('hidden'); $('#wpPhoto').value = '';
+    renderWpPresets();
+  });
+
+  $('#wpShuffle').addEventListener('click', function () {
+    $('#wpText').value = WP_QUOTES[Math.floor(Math.random() * WP_QUOTES.length)];
+    renderWallpaper();
+  });
+  $('#wpText').addEventListener('input', renderWallpaper);
+
+  $$('.wp-ratio').forEach(function (b) {
+    b.addEventListener('click', function () {
+      wpState.ratio = b.dataset.ratio;
+      $$('.wp-ratio').forEach(function (x) { x.classList.toggle('active', x === b); });
+      renderWallpaper();
+    });
+  });
+  $$('.wp-pos').forEach(function (b) {
+    b.addEventListener('click', function () {
+      wpState.pos = b.dataset.pos;
+      $$('.wp-pos').forEach(function (x) { x.classList.toggle('active', x === b); });
+      renderWallpaper();
+    });
+  });
+  $$('.wp-tone').forEach(function (b) {
+    b.addEventListener('click', function () {
+      wpState.tone = b.dataset.tone;
+      $$('.wp-tone').forEach(function (x) { x.classList.toggle('active', x === b); });
+      renderWallpaper();
+    });
+  });
+  $('#wpSize').addEventListener('input', function () { wpState.size = +this.value; renderWallpaper(); });
+
+  function drawCover(c, img, w, h) {
+    var ir = img.width / img.height, cr = w / h, sw, sh, sx, sy;
+    if (ir > cr) { sh = img.height; sw = sh * cr; sx = (img.width - sw) / 2; sy = 0; }
+    else { sw = img.width; sh = sw / cr; sy = (img.height - sh) / 2; sx = 0; }
+    c.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
+  }
+  function drawWpText(c, ratio) {
+    var text = $('#wpText').value.trim();
+    var w = ratio.w, h = ratio.h;
+    var scrim = c.createLinearGradient(0, 0, 0, h);
+    scrim.addColorStop(0, 'rgba(0,0,0,0.10)');
+    scrim.addColorStop(0.5, 'rgba(0,0,0,0.24)');
+    scrim.addColorStop(1, 'rgba(0,0,0,0.10)');
+    c.fillStyle = scrim; c.fillRect(0, 0, w, h);
+    if (!text) return;
+    var px = Math.round(wpState.size * (w / 1080));
+    c.font = '600 ' + px + 'px "Cinzel", "Georgia", serif';
+    c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineJoin = 'round';
+    var maxW = w * 0.82;
+    var words = text.split(/\s+/), lines = [], cur = '';
+    words.forEach(function (wd) {
+      var t = cur ? cur + ' ' + wd : wd;
+      if (c.measureText(t).width > maxW && cur) { lines.push(cur); cur = wd; }
+      else cur = t;
+    });
+    if (cur) lines.push(cur);
+    var lh = px * 1.35, total = lines.length * lh;
+    var y0 = wpState.pos === 'top' ? h * 0.18 : wpState.pos === 'bottom' ? h * 0.72 : h * 0.5;
+    y0 -= total / 2;
+    var fill = wpState.tone === 'light' ? '#ffffff' : '#241a3a';
+    lines.forEach(function (ln, i) {
+      var y = y0 + i * lh + lh / 2;
+      if (wpState.tone === 'light') {
+        c.strokeStyle = 'rgba(0,0,0,0.45)'; c.lineWidth = px * 0.12; c.strokeText(ln, w / 2, y);
+      }
+      c.fillStyle = fill;
+      c.shadowColor = wpState.tone === 'light' ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.25)';
+      c.shadowBlur = px * 0.25;
+      c.fillText(ln, w / 2, y);
+      c.shadowBlur = 0;
+    });
+  }
+  function renderWallpaper() {
+    var ratio = WP_RATIOS[wpState.ratio];
+    var cnv = $('#wpCanvas'); cnv.width = ratio.w; cnv.height = ratio.h;
+    var c = cnv.getContext('2d');
+    if (wpState.photo) {
+      var img = new Image();
+      img.onload = function () { drawCover(c, img, ratio.w, ratio.h); drawWpText(c, ratio); };
+      img.src = wpState.photo;
+    } else {
+      WP_PRESETS[wpState.preset](c, ratio.w, ratio.h);
+      drawWpText(c, ratio);
+    }
+  }
+
+  $('#wpExport').addEventListener('click', function () {
+    $('#wpCanvas').toBlob(function (blob) {
+      if (!blob) return;
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'luminara-affirmation-' + wpState.ratio + '.png';
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+      var t = $('#wpGuideText');
+      var ua = navigator.userAgent;
+      if (/iPhone|iPad|iPod/i.test(ua)) t.textContent = '1. The image was saved to Photos. 2. Open it in Photos → tap the Share icon (⬆) → "Use as Wallpaper" → Set.';
+      else if (/Android/i.test(ua)) t.textContent = '1. The image was saved to your gallery. 2. Open it, tap ⋮ → "Set as wallpaper" (some phones: long-press the image).';
+      else if (/Windows/i.test(ua)) t.textContent = '1. The image was downloaded. 2. Find it in Downloads, right-click → "Set as desktop background".';
+      else t.textContent = '1. The image was downloaded. 2. Open it and set as wallpaper (right-click → Set as desktop background).';
+      $('#wpGuide').classList.remove('hidden');
+    }, 'image/png');
+  });
+
+  renderWpPresets();
+  $('#wpText').value = WP_QUOTES[0];
+  renderWallpaper();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(renderWallpaper);
+
   /* ═══════ Theme Switcher ═══════ */
   var THEME_KEY = 'luminara_theme_v1';
   var THEMES = ['luminara', 'manifest-light', 'manifest-dark', 'prism'];
