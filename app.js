@@ -984,6 +984,102 @@
   renderWallpaper();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(renderWallpaper);
 
+  /* ═══════ AI Avatar Speaker ═══════ */
+  var AV_PRESETS = [
+    { ico: '👩', name: 'Warm Woman', prompt: 'portrait of a warm, friendly woman in her 30s with soft brown hair and kind brown eyes, gentle smile, soft studio light' },
+    { ico: '👨', name: 'Kind Man', prompt: 'portrait of a kind, wise man in his 40s with short dark hair and a gentle smile, warm lighting' },
+    { ico: '🧑', name: 'Peaceful Guide', prompt: 'portrait of a calm, serene person with a peaceful expression, soft natural light' },
+    { ico: '👵', name: 'Elder Sage', prompt: 'portrait of a wise elderly woman with silver hair and sparkling eyes, sage energy, soft light' },
+    { ico: '🧕', name: 'Cosmic Muse', prompt: 'portrait of a mystical woman with flowing hair and luminous eyes, ethereal glow' },
+    { ico: '🧔', name: 'Strong Mentor', prompt: 'portrait of a confident mentor with a reassuring smile, cinematic light' }
+  ];
+  var AV_BASE = 'https://image.pollinations.ai/prompt/';
+  var avStateImg = db.avatarImg || null;
+
+  function avPollUrl(prompt) {
+    return AV_BASE + encodeURIComponent(prompt + ', photorealistic portrait, upper body') + '?width=512&height=512&nologo=true&seed=' + Math.floor(Math.random() * 100000);
+  }
+  function renderAvPresets() {
+    var wrap = $('#avPresets'); wrap.innerHTML = '';
+    AV_PRESETS.forEach(function (p, i) {
+      var b = document.createElement('button');
+      b.className = 'av-preset'; b.type = 'button'; b.dataset.i = i;
+      b.innerHTML = '<span class="ap-ico">' + p.ico + '</span>' + p.name;
+      b.addEventListener('click', function () {
+        $('#avPrompt').value = p.prompt;
+        $$('.av-preset').forEach(function (x) { x.classList.toggle('active', x === b); });
+      });
+      wrap.appendChild(b);
+    });
+  }
+  function setAvImg(src, label) {
+    avStateImg = src;
+    db.avatarImg = src; save();
+    $('#avImg').src = src;
+    $('#avState').textContent = label || 'Your avatar is ready ✨ Press ▶ Speak It';
+  }
+  $('#avGen').addEventListener('click', function () {
+    var p = $('#avPrompt').value.trim();
+    if (!p) { $('#avState').textContent = 'Pick a preset or describe your avatar first ✍️'; return; }
+    $('#avState').textContent = 'Creating your avatar… (free AI, ~10 s)';
+    setAvImg(avPollUrl(p), 'Your avatar is ready ✨ Press ▶ Speak It');
+  });
+  $('#avUsePhoto').addEventListener('click', function () { $('#avPhoto').click(); });
+  $('#avPhoto').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    compressImage(f, function (data) {
+      if (!data) return;
+      setAvImg(data, 'Using your photo — press ▶ Speak It');
+    });
+  });
+
+  var avVoices = [];
+  function fillVoices() {
+    if (!window.speechSynthesis) return;
+    avVoices = window.speechSynthesis.getVoices().filter(function (v) { return /^en/i.test(v.lang); });
+    var sel = $('#avVoice'); sel.innerHTML = '';
+    if (!avVoices.length) {
+      var d = document.createElement('option'); d.value = -1; d.textContent = 'Default voice'; sel.appendChild(d); return;
+    }
+    avVoices.forEach(function (v, i) {
+      var o = document.createElement('option'); o.value = i; o.textContent = v.name.replace(/Microsoft |Google |Natural /g, '');
+      sel.appendChild(o);
+    });
+  }
+  if (window.speechSynthesis) {
+    fillVoices();
+    window.speechSynthesis.onvoiceschanged = fillVoices;
+  }
+  function avStopTalk() {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    $('#avFace').classList.remove('talking');
+    $('#avState').textContent = 'Stopped. Press ▶ Speak It to hear it again.';
+  }
+  $('#avStop').addEventListener('click', avStopTalk);
+  $('#avSpeak').addEventListener('click', function () {
+    if (!window.speechSynthesis) { $('#avState').textContent = 'Speech is not supported on this device.'; return; }
+    var text = $('#avText').value.trim();
+    if (!text) { $('#avState').textContent = 'Write an affirmation to speak first ✍️'; return; }
+    if (!avStateImg) { $('#avState').textContent = 'Generate your avatar first — see step 1 ✨'; return; }
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    var vi = $('#avVoice').value;
+    if (avVoices[vi]) u.voice = avVoices[vi];
+    u.rate = 0.95; u.pitch = 1.0;
+    u.onstart = function () { $('#avFace').classList.add('talking'); $('#avState').textContent = 'Speaking… your guide is with you ✨'; };
+    u.onend = function () { $('#avFace').classList.remove('talking'); $('#avState').textContent = 'Done. That affirmation is now yours. ✨'; };
+    u.onerror = function () { $('#avFace').classList.remove('talking'); };
+    window.speechSynthesis.speak(u);
+  });
+  $('#avShuffle').addEventListener('click', function () {
+    $('#avText').value = WP_QUOTES[Math.floor(Math.random() * WP_QUOTES.length)];
+  });
+
+  renderAvPresets();
+  if (avStateImg) { $('#avImg').src = avStateImg; $('#avState').textContent = 'Your avatar is ready ✨ Press ▶ Speak It'; }
+  $('#avText').value = WP_QUOTES[0];
+
   /* ═══════ Theme Switcher ═══════ */
   var THEME_KEY = 'luminara_theme_v1';
   var THEMES = ['luminara', 'manifest-light', 'manifest-dark', 'prism'];

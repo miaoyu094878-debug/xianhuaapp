@@ -304,6 +304,47 @@
         </div>
       </section>
 
+      <!-- AI Avatar Speaker -->
+      <section id="tab-avatar" class="tab-page">
+        <h2 class="page-title">AI Avatar Speaker</h2>
+        <p class="page-sub">Meet your virtual guide — a lifelike avatar who speaks affirmations directly to you.</p>
+
+        <div class="card glass form-card">
+          <label class="field-label">1 · Your avatar</label>
+          <div class="av-presets" id="avPresets"></div>
+          <label class="field-label">or describe your own</label>
+          <input id="avPrompt" type="text" placeholder="e.g. a wise, kind woman with warm brown eyes, soft studio light" maxlength="160">
+          <div class="av-actions">
+            <button id="avGen" class="btn-primary btn-small" type="button">✦ Generate Avatar</button>
+            <button id="avUsePhoto" class="chip" type="button">Use my photo</button>
+            <input type="file" id="avPhoto" accept="image/*" class="hidden">
+          </div>
+          <p class="av-note">Avatar is generated free with Pollinations AI — no key needed.</p>
+        </div>
+
+        <div class="card glass form-card">
+          <div class="av-stage" id="avStage">
+            <div class="av-face" id="avFace">
+              <img id="avImg" alt="your avatar">
+              <div class="av-mouth" id="avMouth"></div>
+              <div class="av-halo"></div>
+            </div>
+            <p class="av-state" id="avState">Pick a preset or describe an avatar to begin ✨</p>
+          </div>
+        </div>
+
+        <div class="card glass form-card">
+          <label class="field-label">2 · Affirmation to speak</label>
+          <textarea id="avText" rows="2" maxlength="160" placeholder="I am worthy of my wildest dreams"></textarea>
+          <button id="avShuffle" class="chip" type="button">✦ Shuffle affirmation</button>
+          <div class="av-controls">
+            <button id="avSpeak" class="btn-primary" type="button">▶ Speak It</button>
+            <button id="avStop" class="chip" type="button">⏹ Stop</button>
+            <select id="avVoice" class="av-voice" aria-label="voice"></select>
+          </div>
+        </div>
+      </section>
+
       <!-- More / Practice Hub -->
       <section id="tab-more" class="tab-page">
         <h2 class="page-title">Your Practice</h2>
@@ -318,6 +359,11 @@
             <span class="mc-ico">🖼</span>
             <span class="mc-title">Wallpaper</span>
             <span class="mc-desc">Affirmation wallpapers</span>
+          </div>
+          <div class="more-card" data-goto="tab-avatar">
+            <span class="mc-ico">👤</span>
+            <span class="mc-title">Avatar</span>
+            <span class="mc-desc">A guide who speaks to you</span>
           </div>
           <div class="more-card" data-goto="tab-goals">
             <span class="mc-ico">☆</span>
