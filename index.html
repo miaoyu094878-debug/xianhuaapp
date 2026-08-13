@@ -189,6 +189,49 @@
         </div>
       </section>
 
+      <!-- AI Vision -->
+      <section id="tab-ai-vision" class="tab-page">
+        <h2 class="page-title">AI Vision</h2>
+        <p class="page-sub">Upload your photo, describe the person you are becoming — AI paints it, then brings it to life.</p>
+
+        <div class="card glass form-card">
+          <label class="field-label">1 · Your photo</label>
+          <input type="file" id="aiPhoto" accept="image/*" class="hidden">
+          <div class="ai-drop" id="aiDrop"><span>📷</span><span>Tap to choose your photo</span></div>
+          <div id="aiPrevBox" class="ai-prev hidden"><img id="aiPrevImg" alt="your photo"><button id="aiPrevClear" class="chip" type="button">Remove</button></div>
+        </div>
+
+        <div class="card glass form-card">
+          <label class="field-label">2 · The self you are becoming</label>
+          <textarea id="aiPrompt" rows="3" placeholder="e.g. me, radiant and confident, standing in a sunlit glass studio in Tokyo, wearing an elegant cream suit, softly smiling" maxlength="300"></textarea>
+        </div>
+
+        <div class="card glass form-card">
+          <button id="aiKeyToggle" class="ai-key-toggle" type="button">⚙ AI Service Key · <span id="aiKeyState">not set</span></button>
+          <div id="aiKeyBox" class="hidden">
+            <p class="ai-key-hint">Get a free trial key at <a href="https://klingai.com/dev" target="_blank" rel="noopener">klingai.com/dev</a> → console → create an API Key. Paste Access Key + Secret Key (or a simple API Key).</p>
+            <label class="field-label">Access Key</label>
+            <input id="aiAk" type="text" placeholder="Access Key" autocomplete="off">
+            <label class="field-label">Secret Key</label>
+            <input id="aiSk" type="password" placeholder="Secret Key" autocomplete="off">
+            <label class="field-label">— or a simple API Key —</label>
+            <input id="aiKey" type="password" placeholder="API Key (skip if using Access/Secret)" autocomplete="off">
+            <button id="aiKeySave" class="btn-primary btn-small" type="button">Save Keys</button>
+          </div>
+        </div>
+
+        <div class="card glass form-card">
+          <div class="ai-modes">
+            <button id="aiBtnPhoto" class="btn-primary btn-small" type="button">✦ Generate Photo</button>
+            <button id="aiBtnVideo" class="btn-primary btn-small" type="button">▶ Generate Video</button>
+          </div>
+          <p class="ai-tip">Photo ≈ 30 s · Video 5–15 min (can leave). Video animates your uploaded photo, or the generated one. Links expire in a few hours — download right away.</p>
+          <div id="aiStatus" class="ai-status"></div>
+        </div>
+
+        <div id="aiResults"></div>
+      </section>
+
       <!-- Meditation -->
       <section id="tab-meditate" class="tab-page">
         <h2 class="page-title">Cosmic Meditation</h2>
@@ -215,6 +258,11 @@
         <h2 class="page-title">Your Practice</h2>
         <p class="page-sub">Everything else, gathered in one calm place.</p>
         <div class="more-grid">
+          <div class="more-card" data-goto="tab-ai-vision">
+            <span class="mc-ico">🎬</span>
+            <span class="mc-title">AI Vision</span>
+            <span class="mc-desc">See &amp; become your future self</span>
+          </div>
           <div class="more-card" data-goto="tab-goals">
             <span class="mc-ico">☆</span>
             <span class="mc-title">Desires</span>

@@ -580,3 +580,34 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; }
+
+/* ---------- AI VISION ---------- */
+.ai-drop {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  padding: 28px 14px; border: 1.5px dashed var(--border-strong); border-radius: 16px;
+  color: var(--text-soft); font-size: 13px; cursor: pointer; transition: 0.3s; text-align: center;
+  background: var(--surface-2);
+}
+.ai-drop span:first-child { font-size: 26px; }
+.ai-drop:hover { border-color: var(--accent); color: var(--accent); }
+.ai-prev { margin-top: 12px; text-align: center; }
+.ai-prev img { max-width: 150px; max-height: 200px; border-radius: 14px; box-shadow: var(--shadow-card); }
+.ai-prev .chip { margin-top: 8px; }
+.ai-key-toggle {
+  width: 100%; border: 1px solid var(--border); background: var(--surface-2);
+  color: var(--text); border-radius: 12px; padding: 13px; font-size: 13px; cursor: pointer; transition: 0.3s;
+}
+.ai-key-toggle:hover { border-color: var(--accent); }
+.ai-key-toggle span { color: var(--accent); font-weight: 600; }
+.ai-key-hint { font-size: 12px; color: var(--text-soft); line-height: 1.7; margin: 10px 0 6px; }
+.ai-key-hint a { color: var(--accent); text-decoration: underline; }
+.ai-modes { display: flex; gap: 10px; flex-wrap: wrap; }
+.ai-modes .btn-primary { flex: 1; min-width: 140px; }
+.ai-tip { font-size: 12px; color: var(--text-dim); margin-top: 10px; line-height: 1.6; }
+.ai-status { font-size: 13px; color: var(--accent); margin-top: 10px; line-height: 1.7; min-height: 18px; }
+.ai-result { position: relative; padding: 16px; margin-bottom: 14px; text-align: center; }
+.ai-result img, .ai-result video { max-width: 100%; max-height: 320px; border-radius: 16px; box-shadow: var(--shadow-card); background: #000; }
+.ai-result .ai-rl { margin-top: 10px; font-size: 12px; color: var(--text-soft); word-break: break-all; line-height: 1.6; }
+.ai-result a.ai-rl { color: var(--accent); text-decoration: underline; display: block; }
+.ai-badge { position: absolute; top: 12px; left: 12px; z-index: 2; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; padding: 4px 9px; border-radius: 999px; background: var(--accent); color: #fff; }
+.ai-badge.video { background: var(--accent2); }

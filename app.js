@@ -608,6 +608,155 @@
     renderToday();
   });
 
+  /* ═══════ AI Vision (Kling AI) ═══════ */
+  var AI_BASE = 'https://api.klingai.com';
+  var aiKeys = db.aiKeys || {};
+  var aiPhotoB64 = null, aiB64Raw = null;
+
+  function b64url(buf) {
+    var bin = '';
+    var bytes = new Uint8Array(buf);
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function makeJwt(ak, sk) {
+    var enc = new TextEncoder();
+    var header = b64url(enc.encode(JSON.stringify({ alg: 'HS256', typ: 'JWT' })));
+    var now = Math.floor(Date.now() / 1000);
+    var payload = b64url(enc.encode(JSON.stringify({ iss: ak, exp: now + 1800, nbf: now - 5 })));
+    var data = enc.encode(header + '.' + payload);
+    return crypto.subtle.importKey('raw', enc.encode(sk), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+      .then(function (key) { return crypto.subtle.sign('HMAC', key, data); })
+      .then(function (sig) { return header + '.' + payload + '.' + b64url(sig); });
+  }
+  function aiAuthHeaders() {
+    if (aiKeys.key) return Promise.resolve({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + aiKeys.key });
+    return makeJwt(aiKeys.ak, aiKeys.sk).then(function (t) { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t }; });
+  }
+  function klingReq(path, method, body) {
+    return aiAuthHeaders().then(function (headers) {
+      return fetch(AI_BASE + path, { method: method, headers: headers, body: body ? JSON.stringify(body) : undefined });
+    }).then(function (res) { return res.json(); }).then(function (j) {
+      if (j.code !== 0) throw new Error(j.message || ('API error ' + j.code));
+      return j.data;
+    });
+  }
+  function pollTask(path, taskId, statusEl, done) {
+    var tries = 0, start = Date.now();
+    var timer = setInterval(function () {
+      tries++;
+      var secs = Math.round((Date.now() - start) / 1000);
+      klingReq(path + '/' + taskId, 'GET').then(function (d) {
+        var st = d.task_status;
+        if (st === 'succeed') { clearInterval(timer); done(null, d); }
+        else if (st === 'failed') { clearInterval(timer); done(d.task_status_msg || 'Task failed', null); }
+        else {
+          statusEl.textContent = 'Creating… ' + fmtSec(secs) + ' (status: ' + st + ')';
+          if (tries >= 90) { clearInterval(timer); done('Timed out after ~15 min', null); }
+        }
+      }).catch(function (e) { clearInterval(timer); done(e.message, null); });
+    }, 10000);
+  }
+  function fmtSec(s) { var m = Math.floor(s / 60), r = s % 60; return m + ':' + (r < 10 ? '0' : '') + r; }
+  function aiHasKeys() { return !!(aiKeys.key || (aiKeys.ak && aiKeys.sk)); }
+  function aiStatus(msg) { $('#aiStatus').textContent = msg; }
+  function aiKeyStateTxt() { return aiHasKeys() ? (aiKeys.key ? 'API key ✓' : 'AK/SK ✓') : 'not set'; }
+
+  $('#aiDrop').addEventListener('click', function () { $('#aiPhoto').click(); });
+  $('#aiPhoto').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    compressImage(f, function (data) {
+      if (!data) { aiStatus('Could not read that image.'); return; }
+      aiPhotoB64 = data; aiB64Raw = data.split(',')[1];
+      $('#aiPrevImg').src = data;
+      $('#aiPrevBox').classList.remove('hidden');
+      aiStatus('Photo ready ✓');
+    });
+  });
+  $('#aiPrevClear').addEventListener('click', function () {
+    aiPhotoB64 = null; aiB64Raw = null;
+    $('#aiPrevBox').classList.add('hidden');
+    $('#aiPhoto').value = '';
+    aiStatus('');
+  });
+  $('#aiKeyToggle').addEventListener('click', function () { $('#aiKeyBox').classList.toggle('hidden'); });
+  $('#aiKeySave').addEventListener('click', function () {
+    aiKeys.ak = $('#aiAk').value.trim(); aiKeys.sk = $('#aiSk').value.trim();
+    aiKeys.key = $('#aiKey').value.trim();
+    if (!aiKeys.ak && !aiKeys.key) aiKeys.sk = '';
+    db.aiKeys = aiKeys; save();
+    $('#aiKeyState').textContent = aiKeyStateTxt();
+    aiStatus(aiHasKeys() ? 'Keys saved ✓' : 'Keys cleared.');
+    $('#aiKeyBox').classList.add('hidden');
+  });
+
+  function aiGenerate(kind) {
+    var prompt = $('#aiPrompt').value.trim();
+    if (!prompt) { aiStatus('Describe the self you are becoming first ✍️'); return; }
+    if (!aiHasKeys()) { aiStatus('Set your AI service key first ⚙ — tap the key section above'); return; }
+    var srcInput = aiB64Raw;
+    if (!srcInput) {
+      var lastPhoto = (db.aiVision || []).filter(function (v) { return v.kind === 'photo'; })[0];
+      if (lastPhoto && lastPhoto.url) srcInput = lastPhoto.url;
+    }
+    if (!srcInput) { aiStatus(kind === 'video' ? 'Add a photo to animate 📷' : 'Add your photo first 📷'); return; }
+    $('#aiBtnPhoto').disabled = true; $('#aiBtnVideo').disabled = true;
+
+    var body, path, pollPath;
+    if (kind === 'photo') {
+      body = { model_name: 'kling-v1', prompt: prompt, image: srcInput, aspect_ratio: '1:1', mode: 'std' };
+      path = '/v1/images/generations'; pollPath = path;
+      aiStatus('Sending to Kling AI…');
+    } else {
+      body = { model_name: 'kling-v1-6', image: srcInput, prompt: prompt, duration: '5', aspect_ratio: '9:16' };
+      path = '/v1/videos/image2video'; pollPath = path;
+      aiStatus('Sending photo to Kling AI…');
+    }
+
+    klingReq(path, 'POST', body).then(function (d) {
+      aiStatus(kind === 'photo' ? 'Generating photo… (≈30 s)' : 'Generating video… (5–15 min, you can leave)');
+      pollTask(pollPath, d.task_id, $('#aiStatus'), function (err, res) {
+        $('#aiBtnPhoto').disabled = false; $('#aiBtnVideo').disabled = false;
+        if (err) { aiStatus('❌ ' + err); return; }
+        var url = kind === 'photo' ? res.task_result.images[0].url : res.task_result.videos[0].url;
+        db.aiVision = db.aiVision || [];
+        db.aiVision.unshift({ id: uid(), kind: kind, ts: Date.now(), prompt: prompt, url: url });
+        save();
+        aiStatus('Done ✓ — links expire in a few hours, download now ↓');
+        renderAiResults();
+      });
+    }).catch(function (e) {
+      $('#aiBtnPhoto').disabled = false; $('#aiBtnVideo').disabled = false;
+      aiStatus('❌ ' + e.message);
+    });
+  }
+  $('#aiBtnPhoto').addEventListener('click', function () { aiGenerate('photo'); });
+  $('#aiBtnVideo').addEventListener('click', function () { aiGenerate('video'); });
+
+  function renderAiResults() {
+    var wrap = $('#aiResults');
+    wrap.innerHTML = '';
+    if (!db.aiVision || !db.aiVision.length) { wrap.appendChild(el('div', 'empty', 'Your future self will appear here 🪞')); return; }
+    db.aiVision.forEach(function (v) {
+      var card = el('div', 'card glass ai-result');
+      card.appendChild(el('span', 'ai-badge ' + v.kind, v.kind === 'photo' ? 'Photo' : 'Video'));
+      if (v.kind === 'photo') {
+        var img = document.createElement('img'); img.src = v.url; card.appendChild(img);
+      } else {
+        var vid = document.createElement('video'); vid.src = v.url; vid.controls = true; vid.playsInline = true; card.appendChild(vid);
+      }
+      var when = new Date(v.ts).toLocaleString();
+      card.appendChild(el('p', 'ai-rl', '“' + v.prompt + '” · ' + when));
+      var dl = el('a', 'ai-rl', 'Download ' + (v.kind === 'photo' ? 'photo' : 'video') + ' ↓');
+      dl.href = v.url; dl.setAttribute('download', 'luminara-future-self-' + v.id + (v.kind === 'photo' ? '.jpg' : '.mp4'));
+      card.appendChild(dl);
+      wrap.appendChild(card);
+    });
+  }
+  renderAiResults();
+  $('#aiKeyState').textContent = aiKeyStateTxt();
+
   /* ═══════ Theme Switcher ═══════ */
   var THEME_KEY = 'luminara_theme_v1';
   var THEMES = ['luminara', 'manifest-light', 'manifest-dark', 'prism'];
