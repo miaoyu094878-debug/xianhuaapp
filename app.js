@@ -731,6 +731,27 @@
       aiStatus('❌ ' + e.message);
     });
   }
+  $('#aiBtnFree').addEventListener('click', function () {
+    var prompt = $('#aiPrompt').value.trim();
+    if (!prompt) { aiStatus('Describe the self you are becoming first ✍️'); return; }
+    $('#aiBtnPhoto').disabled = true; $('#aiBtnFree').disabled = true; $('#aiBtnVideo').disabled = true;
+    aiStatus('Generating with free AI (Pollinations)… ~10 s');
+    var url = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt + ', photorealistic portrait, elegant, soft cinematic light') + '?width=768&height=768&nologo=true&seed=' + Math.floor(Math.random() * 1e6);
+    var img = new Image();
+    img.onload = function () {
+      db.aiVision = db.aiVision || [];
+      db.aiVision.unshift({ id: uid(), kind: 'photo', ts: Date.now(), prompt: prompt, url: url, source: 'free' });
+      save();
+      $('#aiBtnPhoto').disabled = false; $('#aiBtnFree').disabled = false; $('#aiBtnVideo').disabled = false;
+      aiStatus('Done ✓ — free photo below ↓');
+      renderAiResults();
+    };
+    img.onerror = function () {
+      $('#aiBtnPhoto').disabled = false; $('#aiBtnFree').disabled = false; $('#aiBtnVideo').disabled = false;
+      aiStatus('❌ Free AI is busy right now — retry, or use ✦ Generate Photo (Kling key).');
+    };
+    img.src = url;
+  });
   $('#aiBtnPhoto').addEventListener('click', function () { aiGenerate('photo'); });
   $('#aiBtnVideo').addEventListener('click', function () { aiGenerate('video'); });
 
@@ -740,7 +761,8 @@
     if (!db.aiVision || !db.aiVision.length) { wrap.appendChild(el('div', 'empty', 'Your future self will appear here 🪞')); return; }
     db.aiVision.forEach(function (v) {
       var card = el('div', 'card glass ai-result');
-      card.appendChild(el('span', 'ai-badge ' + v.kind, v.kind === 'photo' ? 'Photo' : 'Video'));
+      var badgeTxt = v.kind === 'video' ? 'Video' : (v.source === 'free' ? 'Free Photo' : 'Photo');
+      card.appendChild(el('span', 'ai-badge ' + (v.source === 'free' ? 'video' : v.kind), badgeTxt));
       if (v.kind === 'photo') {
         var img = document.createElement('img'); img.src = v.url; card.appendChild(img);
       } else {
@@ -749,7 +771,18 @@
       var when = new Date(v.ts).toLocaleString();
       card.appendChild(el('p', 'ai-rl', '“' + v.prompt + '” · ' + when));
       var dl = el('a', 'ai-rl', 'Download ' + (v.kind === 'photo' ? 'photo' : 'video') + ' ↓');
-      dl.href = v.url; dl.setAttribute('download', 'luminara-future-self-' + v.id + (v.kind === 'photo' ? '.jpg' : '.mp4'));
+      dl.href = v.url;
+      dl.setAttribute('download', 'luminara-future-self-' + v.id + (v.kind === 'photo' ? '.jpg' : '.mp4'));
+      dl.addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch(v.url).then(function (r) { return r.blob(); }).then(function (b) {
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(b);
+          a.download = 'luminara-future-self-' + v.id + (v.kind === 'photo' ? '.jpg' : '.mp4');
+          document.body.appendChild(a); a.click();
+          setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+        }).catch(function () { window.open(v.url, '_blank'); });
+      });
       card.appendChild(dl);
       wrap.appendChild(card);
     });

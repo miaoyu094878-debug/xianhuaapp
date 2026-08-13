@@ -1,5 +1,5 @@
 /* 显化 · Manifest — Service Worker */
-var CACHE = 'luminara-v15';
+var CACHE = 'luminara-v16';
 var ASSETS = [
   './',
   './index.html',
