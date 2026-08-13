@@ -16,7 +16,8 @@
   var STAR_PALETTES = {
     'luminara': ['255,220,170', '210,170,240'],
     'manifest-light': ['232,184,109', '244,166,189', '184,161,227'],
-    'manifest-dark': ['255,255,255', '220,210,255', '255,230,200']
+    'manifest-dark': ['255,255,255', '220,210,255', '255,230,200'],
+    'prism': ['255,255,255', '255,170,190', '255,209,128', '143,195,245']
   };
   var starPalette = STAR_PALETTES['luminara'];
 
@@ -609,7 +610,7 @@
 
   /* ═══════ Theme Switcher ═══════ */
   var THEME_KEY = 'luminara_theme_v1';
-  var THEMES = ['luminara', 'manifest-light', 'manifest-dark'];
+  var THEMES = ['luminara', 'manifest-light', 'manifest-dark', 'prism'];
   function applyTheme(t) {
     if (THEMES.indexOf(t) === -1) t = 'luminara';
     document.documentElement.setAttribute('data-theme', t);
