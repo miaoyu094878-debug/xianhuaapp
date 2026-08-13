@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="luminara">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>Luminara — Manifest Your Reality</title>
+  <meta name="description" content="A dreamy manifestation tool: 369 method, gratitude journal, vision board, future-self audio & affirmations">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#120022">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="starfield"></canvas>
+  <div class="aurora a1"></div>
+  <div class="aurora a2"></div>
+  <div class="aurora a3"></div>
+
+  <div id="app">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-logo">✦</span>
+        <span class="brand-name">Luminara</span>
+      </div>
+      <button id="installBtn" class="install-btn hidden">Install</button>
+    </header>
+
+    <main>
+      <!-- Dashboard -->
+      <section id="tab-today" class="tab-page active">
+        <div class="hero glass">
+          <p class="hero-date" id="todayDate"></p>
+          <h2 class="hero-greeting" id="greeting"></h2>
+          <div class="daily-mantra">
+            <span class="dm-label">Today's mantra</span>
+            <p class="dm-text" id="dailyQuote"></p>
+          </div>
+          <div class="hero-stats">
+            <div class="stat">
+              <span class="stat-num" id="statStreak">0</span>
+              <span class="stat-label">Day Streak</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num" id="statGoals">0</span>
+              <span class="stat-label">Desires</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num" id="statMeditation">0</span>
+              <span class="stat-label">Minutes</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass focus-card" data-goto="tab-369">
+          <div class="focus-top">
+            <span class="focus-title">369 Ritual</span>
+            <span class="focus-meta" id="glance369">Morning 0/3 · Noon 0/6 · Night 0/9</span>
+          </div>
+          <div class="focus-bar"><div id="glance369bar"></div></div>
+        </div>
+
+        <div class="card glass focus-card" data-goto="tab-gratitude">
+          <div class="focus-top">
+            <span class="focus-title">Gratitude</span>
+            <span class="focus-meta" id="glanceGratitude">Write 3 things you're grateful for</span>
+          </div>
+        </div>
+
+        <div class="card glass focus-card" data-goto="tab-future">
+          <div class="focus-top">
+            <span class="focus-title">Future Self ✧</span>
+            <span class="focus-meta" id="glanceFuture">Hear your desire already true</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Goals -->
+      <section id="tab-goals" class="tab-page">
+        <h2 class="page-title">Your Desires</h2>
+        <p class="page-sub">Write them in the present tense, as if they have already manifested.</p>
+        <form id="goalForm" class="card glass form-card">
+          <input type="text" id="goalTitle" placeholder="e.g. I live in my dream beach house" required maxlength="60">
+          <div class="form-row">
+            <select id="goalCategory">
+              <option value="abundance">💎 Abundance</option>
+              <option value="love">💖 Love</option>
+              <option value="career">⭐ Purpose</option>
+              <option value="wellness">🌙 Wellness</option>
+              <option value="growth">🌱 Growth</option>
+            </select>
+            <input type="date" id="goalDate" title="Target date (optional)">
+          </div>
+          <button type="submit" class="btn-primary">Plant This Seed ✦</button>
+        </form>
+        <div id="goalList" class="list"></div>
+      </section>
+
+      <!-- 369 -->
+      <section id="tab-369" class="tab-page">
+        <h2 class="page-title">369 Manifestation Ritual</h2>
+        <p class="page-sub">Write 3× in the morning, 6× at noon, 9× at night. Focus on the feeling of your desire already fulfilled.</p>
+        <div class="card glass form-card">
+          <label class="field-label">Today's Affirmation</label>
+          <div class="form-row">
+            <input type="text" id="affirmInput" placeholder="I am worthy of all abundance" maxlength="50">
+            <button id="affirmSave" class="btn-primary btn-small">Set</button>
+          </div>
+          <p class="current-affirm" id="currentAffirm"></p>
+        </div>
+        <div id="sessions"></div>
+        <div id="done369" class="celebration hidden">
+          <span class="cel-emoji">✧</span>
+          <span>Ritual complete! The Universe has received your order.</span>
+        </div>
+      </section>
+
+      <!-- Affirmations -->
+      <section id="tab-affirm" class="tab-page">
+        <h2 class="page-title">Sacred Affirmations</h2>
+        <p class="page-sub">Speak them aloud. Let the words sink into your subconscious.</p>
+        <div class="chips" id="affirmCats"></div>
+
+        <!-- Stella-style Swipe collector -->
+        <div class="swipe-block">
+          <div class="swipe-head">
+            <span class="sb-title">✧ Swipe to collect your favorites</span>
+            <button id="swipeReset" class="link-btn">Reset</button>
+          </div>
+          <div id="swipeDeck" class="swipe-deck"></div>
+          <div class="swipe-actions">
+            <button id="swipeSkip" class="swipe-btn skip" aria-label="Skip">✕</button>
+            <button id="swipeSave" class="swipe-btn save" aria-label="Save">♥</button>
+          </div>
+        </div>
+
+        <div id="affirmList" class="list"></div>
+      </section>
+
+      <!-- Gratitude -->
+      <section id="tab-gratitude" class="tab-page">
+        <h2 class="page-title">Gratitude Journal</h2>
+        <p class="page-sub">Gratitude is the highest frequency. What are you thankful for today?</p>
+        <form id="gratForm" class="card glass form-card">
+          <input type="text" class="grat-input" placeholder="1. I am grateful for…" maxlength="60">
+          <input type="text" class="grat-input" placeholder="2. I am grateful for…" maxlength="60">
+          <input type="text" class="grat-input" placeholder="3. I am grateful for…" maxlength="60">
+          <button type="submit" class="btn-primary">Save Gratitude ✿</button>
+        </form>
+        <div id="gratHistory" class="list"></div>
+      </section>
+
+      <!-- Vision Board -->
+      <section id="tab-vision" class="tab-page">
+        <h2 class="page-title">Vision Board</h2>
+        <p class="page-sub">Visualize your dream life. See it every day.</p>
+        <form id="visionForm" class="card glass form-card">
+          <div class="form-row">
+            <input type="text" id="visionEmoji" placeholder="emoji" maxlength="4" value="🌊">
+            <input type="text" id="visionText" placeholder="Describe your vision…" required maxlength="40">
+          </div>
+          <label class="photo-label">Add a photo (optional)
+            <input type="file" id="visionPhoto" accept="image/*">
+          </label>
+          <button type="submit" class="btn-primary">Pin It ✦</button>
+        </form>
+        <div id="visionBoard" class="vision-grid"></div>
+      </section>
+
+      <!-- Future Self -->
+      <section id="tab-future" class="tab-page">
+        <h2 class="page-title">Future Self</h2>
+        <p class="page-sub">Hear your desire spoken as if it has already come true. Your future self is calling.</p>
+        <form id="fsForm" class="card glass form-card">
+          <label class="field-label">What are you manifesting?</label>
+          <textarea id="fsDesire" rows="3" placeholder="e.g. I run a thriving creative studio that lights people up" maxlength="160"></textarea>
+          <button type="submit" class="btn-primary">Generate My Future Self ✦</button>
+        </form>
+        <div id="fsPlayer" class="card glass hidden">
+          <p class="fs-script" id="fsScript"></p>
+          <div class="fs-controls">
+            <button id="fsPlay" class="btn-primary btn-small">▶ Play</button>
+            <button id="fsAmbient" class="chip" aria-pressed="false">Ambient: Off</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Meditation -->
+      <section id="tab-meditate" class="tab-page">
+        <h2 class="page-title">Cosmic Meditation</h2>
+        <p class="page-sub">Close your eyes. Breathe. Feel your desire as if it's already yours.</p>
+        <div class="card glass meditate-card">
+          <div class="breath-wrap">
+            <div class="breath-ring"></div>
+            <div class="breath-circle" id="breathCircle">
+              <span id="breathText">Ready</span>
+            </div>
+          </div>
+          <div class="med-time" id="medTimer">05:00</div>
+          <div class="chips center">
+            <button class="chip dur-chip" data-min="3">3 min</button>
+            <button class="chip dur-chip active" data-min="5">5 min</button>
+            <button class="chip dur-chip" data-min="10">10 min</button>
+          </div>
+          <button id="medStart" class="btn-primary">Begin Journey ✦</button>
+        </div>
+      </section>
+
+      <!-- More / Practice Hub -->
+      <section id="tab-more" class="tab-page">
+        <h2 class="page-title">Your Practice</h2>
+        <p class="page-sub">Everything else, gathered in one calm place.</p>
+        <div class="more-grid">
+          <div class="more-card" data-goto="tab-goals">
+            <span class="mc-ico">☆</span>
+            <span class="mc-title">Desires</span>
+            <span class="mc-desc">Plant &amp; track your intentions</span>
+          </div>
+          <div class="more-card" data-goto="tab-gratitude">
+            <span class="mc-ico">✿</span>
+            <span class="mc-title">Gratitude</span>
+            <span class="mc-desc">A daily thanks journal</span>
+          </div>
+          <div class="more-card" data-goto="tab-vision">
+            <span class="mc-ico">◈</span>
+            <span class="mc-title">Vision Board</span>
+            <span class="mc-desc">Visualize your dream life</span>
+          </div>
+          <div class="more-card" data-goto="tab-meditate">
+            <span class="mc-ico">◎</span>
+            <span class="mc-title">Breathe</span>
+            <span class="mc-desc">Cosmic meditation timer</span>
+          </div>
+          <div class="more-card" data-goto="tab-future">
+            <span class="mc-ico">✧</span>
+            <span class="mc-title">Future Self</span>
+            <span class="mc-desc">Hear your desire fulfilled</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="tab-bar">
+      <button class="tab-btn active" data-tab="tab-today"><span class="tb-icon">✦</span><span class="tb-label">Home</span></button>
+      <button class="tab-btn" data-tab="tab-369"><span class="tb-icon">✧</span><span class="tb-label">369</span></button>
+      <button class="tab-btn" data-tab="tab-affirm"><span class="tb-icon">❋</span><span class="tb-label">Affirm</span></button>
+      <button class="tab-btn" data-tab="tab-more"><span class="tb-icon">☰</span><span class="tb-label">More</span></button>
+    </nav>
+
+    <!-- Theme Switcher -->
+    <button id="themeFab" class="theme-fab" aria-label="Switch theme">✦</button>
+    <div id="themePanel" class="theme-panel hidden">
+      <p class="theme-panel-title">Choose a look</p>
+      <button class="theme-opt" data-theme="luminara"><span class="to-ico">✦</span><span class="to-name">Luminara</span><span class="to-desc">Dreamy lavender</span></button>
+      <button class="theme-opt" data-theme="manifest-light"><span class="to-ico">☀</span><span class="to-name">Manifest Light</span><span class="to-desc">Liquid gold & glass</span></button>
+      <button class="theme-opt" data-theme="manifest-dark"><span class="to-ico">🌙</span><span class="to-name">Manifest Dark</span><span class="to-desc">Cosmic nebula</span></button>
+    </div>
+
+    <!-- Onboarding Quiz -->
+    <div id="quizModal" class="quiz-modal hidden">
+      <div class="quiz-card glass">
+        <div class="quiz-step" data-step="1">
+          <h3>Welcome to Luminara ✦</h3>
+          <p class="quiz-q">Let's make this truly yours. What should we call you?</p>
+          <input id="qName" type="text" placeholder="Your name" maxlength="20">
+          <button class="btn-primary q-next">Continue</button>
+        </div>
+        <div class="quiz-step hidden" data-step="2">
+          <h3>What do you most want to shift?</h3>
+          <p class="quiz-q">Pick the area calling to you right now.</p>
+          <div class="chips center" id="qCats">
+            <button class="chip" data-cat="Abundance">💎 Abundance</button>
+            <button class="chip" data-cat="Love">💖 Love</button>
+            <button class="chip" data-cat="Career">⭐ Purpose</button>
+            <button class="chip" data-cat="Wellness">🌙 Wellness</button>
+            <button class="chip" data-cat="Growth">🌱 Growth</button>
+          </div>
+          <button class="btn-primary q-next">Continue</button>
+        </div>
+        <div class="quiz-step hidden" data-step="3">
+          <h3>What are you manifesting?</h3>
+          <p class="quiz-q">One sentence. The future self script will use it.</p>
+          <textarea id="qDesire" rows="3" placeholder="e.g. I wake up free, fulfilled, and deeply loved" maxlength="160"></textarea>
+          <button class="btn-primary" id="qFinish">Begin Journey ✦</button>
+        </div>
+        <div class="quiz-dots"><span class="qdot active"></span><span class="qdot"></span><span class="qdot"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
