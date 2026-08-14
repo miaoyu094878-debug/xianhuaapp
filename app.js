@@ -588,7 +588,11 @@
     $$('.qdot').forEach(function (d, i) { d.classList.toggle('active', i === n - 1); });
   }
   function showQuiz() { $('#quizModal').classList.remove('hidden'); setQuizStep(1); }
-  function maybeShowQuiz() { if (!db.profile || !db.profile.name) showQuiz(); }
+  function maybeShowQuiz() { if (!db.profile || !db.profile.name) { if (!db.quizSkipped) showQuiz(); } }
+  $('#qSkip').addEventListener('click', function () {
+    db.quizSkipped = true; save();
+    $('#quizModal').classList.add('hidden');
+  });
   $$('.q-next').forEach(function (b) {
     b.addEventListener('click', function () { setQuizStep(Math.min(3, qStep + 1)); });
   });
@@ -606,6 +610,28 @@
     save();
     $('#quizModal').classList.add('hidden');
     renderToday();
+  });
+
+  /* ═══════ Theme Switcher ═══════ */
+  var THEME_KEY = 'luminara_theme_v1';
+  var THEMES = ['luminara', 'manifest-light', 'manifest-dark', 'prism'];
+  function applyTheme(t) {
+    if (THEMES.indexOf(t) === -1) t = 'luminara';
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem(THEME_KEY, t);
+    starPalette = STAR_PALETTES[t] || STAR_PALETTES['luminara'];
+    $$('.theme-opt').forEach(function (o) { o.classList.toggle('active', o.dataset.theme === t); });
+  }
+  var savedTheme = localStorage.getItem(THEME_KEY);
+  if (savedTheme) applyTheme(savedTheme);
+
+  var fab = $('#themeFab'), panel = $('#themePanel');
+  fab.addEventListener('click', function (e) { e.stopPropagation(); panel.classList.toggle('hidden'); });
+  document.addEventListener('click', function (e) {
+    if (!panel.contains(e.target) && e.target !== fab) panel.classList.add('hidden');
+  });
+  $$('.theme-opt').forEach(function (o) {
+    o.addEventListener('click', function () { applyTheme(o.dataset.theme); panel.classList.add('hidden'); });
   });
 
   /* ═══════ AI Vision (Kling AI) ═══════ */
@@ -1112,28 +1138,6 @@
   renderAvPresets();
   if (avStateImg) { $('#avImg').src = avStateImg; $('#avState').textContent = 'Your avatar is ready ✨ Press ▶ Speak It'; }
   $('#avText').value = WP_QUOTES[0];
-
-  /* ═══════ Theme Switcher ═══════ */
-  var THEME_KEY = 'luminara_theme_v1';
-  var THEMES = ['luminara', 'manifest-light', 'manifest-dark', 'prism'];
-  function applyTheme(t) {
-    if (THEMES.indexOf(t) === -1) t = 'luminara';
-    document.documentElement.setAttribute('data-theme', t);
-    localStorage.setItem(THEME_KEY, t);
-    starPalette = STAR_PALETTES[t] || STAR_PALETTES['luminara'];
-    $$('.theme-opt').forEach(function (o) { o.classList.toggle('active', o.dataset.theme === t); });
-  }
-  var savedTheme = localStorage.getItem(THEME_KEY);
-  if (savedTheme) applyTheme(savedTheme);
-
-  var fab = $('#themeFab'), panel = $('#themePanel');
-  fab.addEventListener('click', function (e) { e.stopPropagation(); panel.classList.toggle('hidden'); });
-  document.addEventListener('click', function (e) {
-    if (!panel.contains(e.target) && e.target !== fab) panel.classList.add('hidden');
-  });
-  $$('.theme-opt').forEach(function (o) {
-    o.addEventListener('click', function () { applyTheme(o.dataset.theme); panel.classList.add('hidden'); });
-  });
 
   /* ═══════ PWA ═══════ */
   if ('serviceWorker' in navigator) {

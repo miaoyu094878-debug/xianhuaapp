@@ -522,7 +522,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 /* ---------- THEME SWITCHER ---------- */
 .theme-fab {
   position: fixed; right: 16px; bottom: calc(92px + env(safe-area-inset-bottom));
-  z-index: 9999; width: 52px; height: 52px; border-radius: 50%;
+  z-index: 10001; width: 52px; height: 52px; border-radius: 50%;
   border: 1.5px solid var(--border-strong); background: var(--accent);
   color: #fff; font-size: 22px; cursor: pointer;
   box-shadow: 0 6px 22px color-mix(in srgb, var(--accent) 45%, transparent);
@@ -538,7 +538,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .theme-fab:active { transform: scale(0.94); }
 .theme-panel {
   position: fixed; right: 16px; bottom: calc(154px + env(safe-area-inset-bottom));
-  z-index: 9999; width: 230px; padding: 12px; border-radius: 18px;
+  z-index: 10001; width: 230px; padding: 12px; border-radius: 18px;
   background: var(--surface-hover); backdrop-filter: blur(20px) saturate(1.6);
   border: 1px solid var(--border); box-shadow: var(--shadow-hover);
   animation: popIn 0.25s ease;
