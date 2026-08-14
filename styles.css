@@ -669,3 +669,63 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   flex: 1; min-width: 140px; border: 1px solid var(--border); background: var(--surface-2);
   color: var(--text); border-radius: 10px; padding: 10px; font-size: 13px;
 }
+
+/* ════════════════════════════════════════════════════════════════
+   DESKTOP LAYOUT — auto-applies on computers (viewport ≥1024px)
+   Mobile / tablet UI is untouched; this only layers desktop rules.
+   ════════════════════════════════════════════════════════════════ */
+@media (min-width: 1024px) {
+  #app { max-width: 1280px; padding: 0 40px 70px; }
+  main { padding: 18px 0 0; }
+
+  .app-header { padding: 26px 0 6px; }
+  .brand-logo { font-size: 30px; }
+  .brand-name { font-size: 25px; }
+
+  .tab-bar {
+    position: sticky; top: 16px; bottom: auto; left: 0; right: 0; z-index: 30;
+    width: fit-content; margin: 0 auto 30px; padding: 6px 10px;
+    justify-content: center; gap: 2px;
+    border: 1px solid var(--border); border-top-color: rgba(255,255,255,0.9);
+    border-radius: 999px; box-shadow: var(--shadow-card);
+  }
+  .tab-btn { flex-direction: row; max-width: none; padding: 10px 18px; border-radius: 999px; gap: 8px; }
+  .tab-btn .tb-icon { font-size: 17px; }
+  .tab-btn .tb-label { max-height: none; opacity: 1; font-size: 12px; }
+  .tab-btn.active .tb-label { margin-top: 0; }
+
+  .tab-page.active { max-width: 1080px; margin: 0 auto; }
+
+  #tab-today.active { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 22px; align-items: start; }
+  #tab-today .hero { grid-column: 1; grid-row: 1 / 4; margin-bottom: 0; padding: 38px 34px; }
+  #tab-today .focus-card { grid-column: 2; margin-bottom: 0; }
+  .hero-greeting { font-size: 34px; }
+  .hero-quote, .dm-text { font-size: 17px; }
+  .stat-num { font-size: 30px; }
+
+  .more-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .vision-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  #tab-wallpaper.active { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+  #tab-wallpaper .form-card { margin-bottom: 0; }
+  #tab-wallpaper .form-card:nth-child(-n+3) { grid-column: 1; }
+  #tab-wallpaper .form-card:last-child { grid-column: 2; grid-row: 1 / 4; }
+  .wp-canvas { max-height: 620px; }
+
+  #tab-ai-vision.active { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+  #tab-ai-vision > .form-card { grid-column: 1; margin-bottom: 0; }
+  #tab-ai-vision #aiResults { grid-column: 2; grid-row: 1 / 6; }
+  #tab-ai-vision #aiResults .ai-result { margin-bottom: 16px; }
+
+  #tab-avatar.active { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+  #tab-avatar .form-card { margin-bottom: 0; }
+
+  #tab-meditate .meditate-card { max-width: 520px; margin: 0 auto 16px; }
+  #tab-goals .form-card, #tab-future .form-card { max-width: 760px; margin-left: auto; margin-right: auto; }
+
+  .btn-primary { padding: 14px; }
+  .quiz-card { max-width: 460px; }
+
+  .theme-fab { bottom: 28px; right: 28px; }
+  .theme-panel { bottom: 92px; right: 28px; }
+}
