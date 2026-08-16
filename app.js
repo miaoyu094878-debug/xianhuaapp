@@ -171,11 +171,15 @@
       var more = $$('.tab-btn').filter(function (b) { return b.dataset.tab === 'tab-more'; })[0];
       if (more) more.classList.add('active');
     }
+    $$('.side-link').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === id); });
     $$('.tab-page').forEach(function (p) { p.classList.toggle('active', p.id === id); });
     window.scrollTo(0, 0);
   }
   $$('.mini-card, .focus-card, .more-card').forEach(function (c) {
     c.addEventListener('click', function () { goTab(c.dataset.goto); });
+  });
+  $$('.side-link').forEach(function (b) {
+    b.addEventListener('click', function () { goTab(b.dataset.tab); });
   });
 
   /* ═══════ Dashboard ═══════ */
@@ -621,6 +625,7 @@
     localStorage.setItem(THEME_KEY, t);
     starPalette = STAR_PALETTES[t] || STAR_PALETTES['luminara'];
     $$('.theme-opt').forEach(function (o) { o.classList.toggle('active', o.dataset.theme === t); });
+    $$('.ds-theme').forEach(function (o) { o.classList.toggle('active', o.dataset.theme === t); });
   }
   var savedTheme = localStorage.getItem(THEME_KEY);
   if (savedTheme) applyTheme(savedTheme);
@@ -632,6 +637,9 @@
   });
   $$('.theme-opt').forEach(function (o) {
     o.addEventListener('click', function () { applyTheme(o.dataset.theme); panel.classList.add('hidden'); });
+  });
+  $$('.ds-theme').forEach(function (o) {
+    o.addEventListener('click', function () { applyTheme(o.dataset.theme); });
   });
 
   /* ═══════ AI Vision (Kling AI) ═══════ */
