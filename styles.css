@@ -836,3 +836,80 @@ html.device-desktop .wp-canvas { max-height: 640px; }
 html.device-desktop #tab-ai-vision #aiResults { grid-column: 2; grid-row: 1 / 6; }
 html.device-desktop #tab-meditate .meditate-card { max-width: 560px; margin: 0 auto 16px; }
 html.device-desktop #tab-goals .form-card, html.device-desktop #tab-future .form-card { max-width: 780px; margin-left: auto; margin-right: auto; }
+
+/* ════════════════════════════════════════════════════════════════
+   LIQUID GLASS THEME — Apple iOS 26/27 glassmorphism
+   Translucent glass, reflective sheen, blue accent.
+   ════════════════════════════════════════════════════════════════ */
+:root[data-theme="ios"] {
+  --font-heading: -apple-system, BlinkMacSystemFont, 'Barlow', sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Barlow', 'Inter', sans-serif;
+  --bg-grad: linear-gradient(180deg, #f4f7fd 0%, #edf2fc 45%, #e6edfb 100%);
+  --surface: linear-gradient(145deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.28) 60%, rgba(228,237,255,0.35) 100%);
+  --surface-hover: linear-gradient(145deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.42) 60%, rgba(228,237,255,0.5) 100%);
+  --surface-2: rgba(255,255,255,0.55);
+  --border: rgba(255,255,255,0.68);
+  --border-strong: rgba(120,150,220,0.38);
+  --text: #1b1f2b;
+  --text-soft: #4a5568;
+  --text-dim: #8b95a8;
+  --accent: #007aff;
+  --accent2: #5ac8fa;
+  --accent3: #34c759;
+  --cta-grad: linear-gradient(180deg, #0a84ff 0%, #0066ff 100%);
+  --cta-text: #ffffff;
+  --stat-color: #007aff;
+  --heading-italic: normal;
+  --shadow-card: 0 10px 34px rgba(90,120,190,0.16), inset 0 1px 1px rgba(255,255,255,0.9);
+  --shadow-hover: 0 16px 46px rgba(90,120,190,0.24), inset 0 1px 1px rgba(255,255,255,0.95);
+  --aur-a: radial-gradient(circle, rgba(90,200,250,0.35) 0%, transparent 70%);
+  --aur-b: radial-gradient(circle, rgba(160,180,255,0.32) 0%, transparent 70%);
+  --aur-c: radial-gradient(circle, rgba(200,220,255,0.4) 0%, transparent 70%);
+  --aur-op: 0.5;
+  --heading-gradient: linear-gradient(135deg, #007aff, #5ac8fa);
+}
+
+:root[data-theme="ios"] .brand-logo,
+:root[data-theme="ios"] .brand-name { background: var(--heading-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+:root[data-theme="ios"] .glass::before,
+:root[data-theme="ios"] .card::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.4) 26%, rgba(255,255,255,0) 55%, rgba(255,255,255,0.16) 100%);
+  opacity: 0.6;
+}
+:root[data-theme="ios"] .glass, :root[data-theme="ios"] .card {
+  border: 1px solid rgba(255,255,255,0.75);
+  border-top-color: rgba(255,255,255,0.95);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 1px rgba(120,150,220,0.12), 0 10px 34px rgba(90,120,190,0.16);
+}
+:root[data-theme="ios"] .hero {
+  background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(235,242,255,0.45));
+  border: 1px solid rgba(255,255,255,0.8);
+  border-top-color: rgba(255,255,255,0.95);
+}
+:root[data-theme="ios"] .hero-greeting,
+:root[data-theme="ios"] .dm-text { background: var(--heading-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+:root[data-theme="ios"] .btn-primary {
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 16px;
+  box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.45), 0 10px 26px rgba(0,122,255,0.35);
+}
+:root[data-theme="ios"] .tab-bar {
+  background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.32));
+  backdrop-filter: blur(30px) saturate(1.8);
+  -webkit-backdrop-filter: blur(30px) saturate(1.8);
+  border: 1px solid rgba(255,255,255,0.7);
+  border-top-color: rgba(255,255,255,0.9);
+  border-radius: 30px;
+  margin: 0 14px calc(10px + env(safe-area-inset-bottom));
+  box-shadow: 0 8px 30px rgba(80,110,180,0.18), inset 0 1px 1px rgba(255,255,255,0.9);
+}
+:root[data-theme="ios"] input, :root[data-theme="ios"] select, :root[data-theme="ios"] textarea {
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.75);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 3px rgba(80,110,180,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+:root[data-theme="ios"] .breath-circle { background: radial-gradient(circle at 38% 30%, #5ac8fa, #007aff 55%, #0055d4); box-shadow: 0 0 50px rgba(0,122,255,0.4); }
+:root[data-theme="ios"] .more-card { border-color: rgba(255,255,255,0.6); }
