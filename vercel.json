@@ -2,6 +2,9 @@
   "version": 2,
   "buildCommand": null,
   "outputDirectory": ".",
+  "redirects": [
+    { "source": "/", "destination": "/landing.html", "permanent": false }
+  ],
   "headers": [
     {
       "source": "/sw.js",
