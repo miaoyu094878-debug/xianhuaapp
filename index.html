@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <title>Luminara — Manifest Your Reality</title>
-  <meta name="description" content="A dreamy manifestation tool: 369 method, gratitude journal, vision board, future-self audio & affirmations">
+  <meta name="description" content="A dreamy manifestation tool: affirmations, gratitude journal, vision board, future-self audio & AI guidance">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#120022">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -42,7 +42,6 @@
       <nav class="ds-nav">
         <button class="side-link active" data-tab="tab-today">✦ Today</button>
         <p class="ds-group">Daily Practice</p>
-        <button class="side-link" data-tab="tab-369">✧ 369 Ritual</button>
         <button class="side-link" data-tab="tab-affirm">❋ Affirm</button>
         <button class="side-link" data-tab="tab-gratitude">✿ Gratitude</button>
         <p class="ds-group">Create</p>
@@ -101,14 +100,6 @@
           </div>
         </div>
 
-        <div class="card glass focus-card" data-goto="tab-369">
-          <div class="focus-top">
-            <span class="focus-title">369 Ritual</span>
-            <span class="focus-meta" id="glance369">Morning 0/3 · Noon 0/6 · Night 0/9</span>
-          </div>
-          <div class="focus-bar"><div id="glance369bar"></div></div>
-        </div>
-
         <div class="card glass focus-card" data-goto="tab-gratitude">
           <div class="focus-top">
             <span class="focus-title">Gratitude</span>
@@ -143,25 +134,6 @@
           <button type="submit" class="btn-primary">Plant This Seed ✦</button>
         </form>
         <div id="goalList" class="list"></div>
-      </section>
-
-      <!-- 369 -->
-      <section id="tab-369" class="tab-page">
-        <h2 class="page-title">369 Manifestation Ritual</h2>
-        <p class="page-sub">Write 3× in the morning, 6× at noon, 9× at night. Focus on the feeling of your desire already fulfilled.</p>
-        <div class="card glass form-card">
-          <label class="field-label">Today's Affirmation</label>
-          <div class="form-row">
-            <input type="text" id="affirmInput" placeholder="I am worthy of all abundance" maxlength="50">
-            <button id="affirmSave" class="btn-primary btn-small">Set</button>
-          </div>
-          <p class="current-affirm" id="currentAffirm"></p>
-        </div>
-        <div id="sessions"></div>
-        <div id="done369" class="celebration hidden">
-          <span class="cel-emoji">✧</span>
-          <span>Ritual complete! The Universe has received your order.</span>
-        </div>
       </section>
 
       <!-- Affirmations -->
@@ -449,7 +421,6 @@
 
     <nav class="tab-bar">
       <button class="tab-btn active" data-tab="tab-today"><span class="tb-icon">✦</span><span class="tb-label">Home</span></button>
-      <button class="tab-btn" data-tab="tab-369"><span class="tb-icon">✧</span><span class="tb-label">369</span></button>
       <button class="tab-btn" data-tab="tab-affirm"><span class="tb-icon">❋</span><span class="tb-label">Affirm</span></button>
       <button class="tab-btn" data-tab="tab-more"><span class="tb-icon">☰</span><span class="tb-label">More</span></button>
     </nav>

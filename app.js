@@ -70,7 +70,7 @@
   var KEY = 'manifest_data_v1';
   var defaults = {
     goals: [], gratitude: {}, affirmFavs: [], affirmCustom: [],
-    vision: [], three69: {}, activeDays: [], meditationMin: 0,
+    vision: [], activeDays: [], meditationMin: 0,
     profile: { name: '', area: '', desire: '' }
   };
 
@@ -199,10 +199,6 @@
     $('#statGoals').textContent = db.goals.filter(function (g) { return !g.done; }).length;
     $('#statMeditation').textContent = db.meditationMin;
 
-    var t = db.three69[todayStr()] || {};
-    $('#glance369').textContent = 'Morning ' + (t.morning || 0) + '/3 · Noon ' + (t.afternoon || 0) + '/6 · Night ' + (t.night || 0) + '/9';
-    var done369 = (t.morning || 0) + (t.afternoon || 0) + (t.night || 0);
-    $('#glance369bar').style.width = Math.min(100, done369 / 18 * 100) + '%';
     var g = db.gratitude[todayStr()];
     $('#glanceGratitude').textContent = g && g.length ? g.length + ' blessing' + (g.length > 1 ? 's' : '') + ' recorded ✿' : 'Write 3 things you\'re grateful for';
   }
@@ -239,56 +235,6 @@
     });
   }
 
-  /* ═══════ 369 Ritual ═══════ */
-  var SESSIONS = [
-    { key: 'morning', name: '☀ Dawn', target: 3, tip: 'Set your frequency for the day' },
-    { key: 'afternoon', name: '☼ Noon', target: 6, tip: 'Reinforce the energy of your desire' },
-    { key: 'night', name: '☽ Night', target: 9, tip: 'Let your wish drift into the cosmos as you sleep' }
-  ];
-  function t369() {
-    var t = todayStr();
-    if (!db.three69[t]) db.three69[t] = { affirmation: '', morning: 0, afternoon: 0, night: 0 };
-    return db.three69[t];
-  }
-  $('#affirmSave').addEventListener('click', function () {
-    var v = $('#affirmInput').value.trim();
-    if (!v) return;
-    t369().affirmation = v;
-    $('#affirmInput').value = '';
-    save(); render369();
-  });
-  function render369() {
-    var t = t369();
-    $('#currentAffirm').textContent = t.affirmation ? '「' + t.affirmation + '」' : 'Set your affirmation (in present tense: "I am…", "I have…")';
-    var wrap = $('#sessions');
-    wrap.innerHTML = '';
-    var allDone = true;
-    SESSIONS.forEach(function (s) {
-      var n = t[s.key] || 0;
-      if (n < s.target) allDone = false;
-      var card = el('div', 'card glass session');
-      var info = el('div', 'session-info');
-      info.appendChild(el('h3', null, s.name + '  ·  ' + s.target + '×'));
-      info.appendChild(el('div', 'meta', s.tip));
-      var bar = el('div', 'progress');
-      var fill = el('div');
-      fill.style.width = Math.min(100, n / s.target * 100) + '%';
-      bar.appendChild(fill);
-      info.appendChild(bar);
-      var btn = el('button', 'tap-btn');
-      btn.innerHTML = n >= s.target ? '✓' : '+1<small>' + n + '/' + s.target + '</small>';
-      btn.disabled = n >= s.target || !t.affirmation;
-      btn.addEventListener('click', function () {
-        t[s.key] = (t[s.key] || 0) + 1;
-        if (t[s.key] >= s.target && SESSIONS.every(function (x) { return (t[x.key] || 0) >= x.target; })) markActive();
-        save(); render369(); renderToday();
-      });
-      card.appendChild(info); card.appendChild(btn);
-      wrap.appendChild(card);
-    });
-    $('#done369').classList.toggle('hidden', !(allDone && t.affirmation));
-  }
-
   /* ═══════ Affirmations (List) ═══════ */
   var curCat = 'Abundance';
   var catsWrap = $('#affirmCats');
@@ -320,9 +266,6 @@
         var item = el('div', 'list-item');
         var mid = el('div', 'grow');
         mid.appendChild(el('div', 'title', text));
-        var useBtn = el('button', 'icon-btn', '→');
-        useBtn.title = 'Use for 369 ritual';
-        useBtn.addEventListener('click', function () { t369().affirmation = text; save(); render369(); goTab('tab-369'); });
         var delBtn = el('button', 'icon-btn', '✕');
         delBtn.title = 'Remove';
         delBtn.addEventListener('click', function () {
@@ -330,7 +273,7 @@
           if (i !== -1) db.affirmCustom.splice(i, 1);
           save(); renderAffirm(); initSwipe();
         });
-        item.appendChild(mid); item.appendChild(useBtn); item.appendChild(delBtn);
+        item.appendChild(mid); item.appendChild(delBtn);
         wrap.appendChild(item);
       });
       wrap.appendChild(el('div', 'list-sep', ''));
@@ -347,10 +290,7 @@
         if (i === -1) db.affirmFavs.push(text); else db.affirmFavs.splice(i, 1);
         save(); renderAffirm();
       });
-      var useBtn = el('button', 'icon-btn', '→');
-      useBtn.title = 'Use for 369 ritual';
-      useBtn.addEventListener('click', function () { t369().affirmation = text; save(); render369(); goTab('tab-369'); });
-      item.appendChild(mid); item.appendChild(useBtn); item.appendChild(favBtn);
+      item.appendChild(mid); item.appendChild(favBtn);
       wrap.appendChild(item);
     });
   }
@@ -1195,7 +1135,7 @@
   });
 
   /* ═══════ Init ═══════ */
-  renderToday(); renderGoals(); render369(); renderAffirm(); renderGrat(); renderVision(); renderMedTime();
+  renderToday(); renderGoals(); renderAffirm(); renderGrat(); renderVision(); renderMedTime();
   initSwipe();
   maybeShowQuiz();
 })();
