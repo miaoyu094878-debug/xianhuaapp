@@ -837,6 +837,10 @@ html.device-desktop #tab-ai-vision #aiResults { grid-column: 2; grid-row: 1 / 6;
 html.device-desktop #tab-meditate .meditate-card { max-width: 560px; margin: 0 auto 16px; }
 html.device-desktop #tab-goals .form-card, html.device-desktop #tab-future .form-card { max-width: 780px; margin-left: auto; margin-right: auto; }
 
+/* Custom affirmations */
+.list-head { font-size: 11.5px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-dim); padding: 12px 4px 6px; }
+.list-sep { border-top: 1px solid var(--border); margin: 8px 0 12px; }
+
 /* ════════════════════════════════════════════════════════════════
    LIQUID GLASS THEME — Apple iOS 26/27 glassmorphism
    Translucent glass, reflective sheen, blue accent.

@@ -69,7 +69,7 @@
   /* ═══════ Data Layer ═══════ */
   var KEY = 'manifest_data_v1';
   var defaults = {
-    goals: [], gratitude: {}, affirmFavs: [],
+    goals: [], gratitude: {}, affirmFavs: [], affirmCustom: [],
     vision: [], three69: {}, activeDays: [], meditationMin: 0,
     profile: { name: '', area: '', desire: '' }
   };
@@ -301,9 +301,40 @@
     });
     catsWrap.appendChild(b);
   });
+  $('#affirmAdd').addEventListener('click', function () {
+    var t = $('#affirmNew').value.trim();
+    if (!t) return;
+    if (db.affirmCustom.indexOf(t) === -1) db.affirmCustom.push(t);
+    $('#affirmNew').value = '';
+    save(); renderAffirm(); initSwipe();
+  });
+  $('#affirmNew').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); $('#affirmAdd').click(); }
+  });
   function renderAffirm() {
     var wrap = $('#affirmList');
     wrap.innerHTML = '';
+    if (db.affirmCustom && db.affirmCustom.length) {
+      wrap.appendChild(el('div', 'list-head', 'My affirmations'));
+      db.affirmCustom.forEach(function (text) {
+        var item = el('div', 'list-item');
+        var mid = el('div', 'grow');
+        mid.appendChild(el('div', 'title', text));
+        var useBtn = el('button', 'icon-btn', '→');
+        useBtn.title = 'Use for 369 ritual';
+        useBtn.addEventListener('click', function () { t369().affirmation = text; save(); render369(); goTab('tab-369'); });
+        var delBtn = el('button', 'icon-btn', '✕');
+        delBtn.title = 'Remove';
+        delBtn.addEventListener('click', function () {
+          var i = db.affirmCustom.indexOf(text);
+          if (i !== -1) db.affirmCustom.splice(i, 1);
+          save(); renderAffirm(); initSwipe();
+        });
+        item.appendChild(mid); item.appendChild(useBtn); item.appendChild(delBtn);
+        wrap.appendChild(item);
+      });
+      wrap.appendChild(el('div', 'list-sep', ''));
+    }
     AFFIRMATIONS[curCat].forEach(function (text) {
       var fav = db.affirmFavs.indexOf(text) !== -1;
       var item = el('div', 'list-item');
@@ -334,6 +365,7 @@
   function initSwipe() {
     var pool = [];
     Object.keys(AFFIRMATIONS).forEach(function (c) { AFFIRMATIONS[c].forEach(function (t) { pool.push(t); }); });
+    (db.affirmCustom || []).forEach(function (t) { pool.push(t); });
     swipeQueue = shuffle(pool);
     renderSwipe();
   }
