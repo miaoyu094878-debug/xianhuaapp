@@ -79,7 +79,7 @@
     try { var raw = localStorage.getItem(KEY); if (raw) return Object.assign({}, defaults, JSON.parse(raw)); } catch (e) {}
     return Object.assign({}, defaults);
   }
-  function save() { localStorage.setItem(KEY, JSON.stringify(db)); }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} }
   function todayStr() {
     var d = new Date();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -595,12 +595,13 @@
   function applyTheme(t) {
     if (THEMES.indexOf(t) === -1) t = 'luminara';
     document.documentElement.setAttribute('data-theme', t);
-    localStorage.setItem(THEME_KEY, t);
+    try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
     starPalette = STAR_PALETTES[t] || STAR_PALETTES['luminara'];
     $$('.theme-opt').forEach(function (o) { o.classList.toggle('active', o.dataset.theme === t); });
     $$('.ds-theme').forEach(function (o) { o.classList.toggle('active', o.dataset.theme === t); });
   }
-  var savedTheme = localStorage.getItem(THEME_KEY);
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem(THEME_KEY); } catch (e) {}
   if (savedTheme) applyTheme(savedTheme);
 
   var fab = $('#themeFab'), panel = $('#themePanel');
@@ -819,12 +820,12 @@
   var wpState = { preset: 0, ratio: 'phone', pos: 'center', tone: 'light', size: 48, photo: null };
   var WP_RATIOS = { phone: { w: 1080, h: 1920 }, desktop: { w: 1920, h: 1080 } };
 
-  function blob(c, x, y, r, col) {
+  function wpBlob(c, x, y, r, col) {
     var g = c.createRadialGradient(x, y, 0, x, y, r);
     g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)');
     c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
   }
-  function stars(c, w, h, n) {
+  function wpStars(c, w, h, n) {
     for (var i = 0; i < n; i++) {
       c.fillStyle = 'rgba(255,255,255,' + (Math.random() * 0.7 + 0.25) + ')';
       c.beginPath(); c.arc(Math.random() * w, Math.random() * h, Math.random() * 2 + 0.5, 0, Math.PI * 2); c.fill();
@@ -835,44 +836,44 @@
       var g = c.createLinearGradient(0, 0, w, h);
       g.addColorStop(0, '#f3e8ff'); g.addColorStop(0.5, '#ffe3f1'); g.addColorStop(1, '#e8d5ff');
       c.fillStyle = g; c.fillRect(0, 0, w, h);
-      blob(c, w * 0.75, h * 0.2, w * 0.6, 'rgba(160,120,230,0.35)');
-      blob(c, w * 0.15, h * 0.8, w * 0.55, 'rgba(240,150,190,0.35)');
+      wpBlob(c, w * 0.75, h * 0.2, w * 0.6, 'rgba(160,120,230,0.35)');
+      wpBlob(c, w * 0.15, h * 0.8, w * 0.55, 'rgba(240,150,190,0.35)');
     },
     function (c, w, h) {
       var g = c.createLinearGradient(0, 0, w, h);
       g.addColorStop(0, '#0b0014'); g.addColorStop(1, '#1b0b33');
       c.fillStyle = g; c.fillRect(0, 0, w, h);
-      blob(c, w * 0.7, h * 0.25, w * 0.5, 'rgba(150,110,230,0.4)');
-      stars(c, w, h, 130);
+      wpBlob(c, w * 0.7, h * 0.25, w * 0.5, 'rgba(150,110,230,0.4)');
+      wpStars(c, w, h, 130);
     },
     function (c, w, h) {
       var g = c.createLinearGradient(0, h, 0, 0);
       g.addColorStop(0, '#061c3a'); g.addColorStop(1, '#0a0f2e');
       c.fillStyle = g; c.fillRect(0, 0, w, h);
-      blob(c, w * 0.3, h * 0.35, w * 0.8, 'rgba(60,220,190,0.30)');
-      blob(c, w * 0.75, h * 0.5, w * 0.6, 'rgba(130,90,230,0.35)');
-      stars(c, w, h, 60);
+      wpBlob(c, w * 0.3, h * 0.35, w * 0.8, 'rgba(60,220,190,0.30)');
+      wpBlob(c, w * 0.75, h * 0.5, w * 0.6, 'rgba(130,90,230,0.35)');
+      wpStars(c, w, h, 60);
     },
     function (c, w, h) {
       var g = c.createLinearGradient(0, 0, 0, h);
       g.addColorStop(0, '#fff3d6'); g.addColorStop(1, '#ffd9a0');
       c.fillStyle = g; c.fillRect(0, 0, w, h);
-      blob(c, w * 0.5, h * 0.75, w * 0.7, 'rgba(255,190,120,0.5)');
+      wpBlob(c, w * 0.5, h * 0.75, w * 0.7, 'rgba(255,190,120,0.5)');
     },
     function (c, w, h) {
       var g = c.createLinearGradient(0, 0, w, h);
       g.addColorStop(0, '#eafff6'); g.addColorStop(1, '#d7f5ea');
       c.fillStyle = g; c.fillRect(0, 0, w, h);
-      blob(c, w * 0.8, h * 0.25, w * 0.5, 'rgba(120,220,190,0.35)');
-      blob(c, w * 0.2, h * 0.8, w * 0.4, 'rgba(190,240,220,0.5)');
+      wpBlob(c, w * 0.8, h * 0.25, w * 0.5, 'rgba(120,220,190,0.35)');
+      wpBlob(c, w * 0.2, h * 0.8, w * 0.4, 'rgba(190,240,220,0.5)');
     },
     function (c, w, h) {
       var g = c.createLinearGradient(0, 0, w, h);
       g.addColorStop(0, '#160a26'); g.addColorStop(1, '#3a1030');
       c.fillStyle = g; c.fillRect(0, 0, w, h);
-      blob(c, w * 0.5, h * 0.6, w * 0.6, 'rgba(255,170,190,0.28)');
-      blob(c, w * 0.25, h * 0.25, w * 0.4, 'rgba(240,190,120,0.25)');
-      stars(c, w, h, 90);
+      wpBlob(c, w * 0.5, h * 0.6, w * 0.6, 'rgba(255,170,190,0.28)');
+      wpBlob(c, w * 0.25, h * 0.25, w * 0.4, 'rgba(240,190,120,0.25)');
+      wpStars(c, w, h, 90);
     }
   ];
 
