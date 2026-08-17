@@ -70,7 +70,7 @@
   var KEY = 'manifest_data_v1';
   var defaults = {
     goals: [], gratitude: {}, affirmFavs: [], affirmCustom: [],
-    vision: [], activeDays: [], meditationMin: 0,
+    vision: [], activeDays: [], meditationMin: 0, saved: [],
     profile: { name: '', area: '', desire: '' }
   };
 
@@ -1120,6 +1120,79 @@
   renderAvPresets();
   if (avStateImg) { $('#avImg').src = avStateImg; $('#avState').textContent = 'Your avatar is ready ✨ Press ▶ Speak It'; }
   $('#avText').value = WP_QUOTES[0];
+
+  /* ═══════ Saved Inspiration (collect from any app) ═══════ */
+  function renderSaved() {
+    var wrap = $('#savedList');
+    wrap.innerHTML = '';
+    if (!db.saved || !db.saved.length) {
+      wrap.appendChild(el('div', 'empty', 'Nothing saved yet — share or paste something inspiring ✨'));
+      return;
+    }
+    db.saved.forEach(function (s) {
+      var item = el('div', 'list-item');
+      var mid = el('div', 'grow');
+      if (s.title) mid.appendChild(el('div', 'title', s.title));
+      var isLink = s.link || /^https?:\/\//i.test(s.text);
+      if (isLink) {
+        var a = document.createElement('a');
+        a.className = 'saved-link';
+        a.href = s.link || s.text;
+        a.target = '_blank'; a.rel = 'noopener';
+        a.textContent = s.link || s.text;
+        mid.appendChild(a);
+      } else {
+        mid.appendChild(el('div', 'title', s.text));
+      }
+      var when = new Date(s.ts).toLocaleDateString();
+      mid.appendChild(el('div', 'meta', (s.from === 'share' ? '🔗 Shared' : '🔖 Saved') + ' · ' + when));
+      var delBtn = el('button', 'icon-btn', '✕');
+      delBtn.title = 'Remove';
+      delBtn.addEventListener('click', function () {
+        db.saved = db.saved.filter(function (x) { return x.id !== s.id; });
+        save(); renderSaved();
+      });
+      item.appendChild(mid); item.appendChild(delBtn);
+      wrap.appendChild(item);
+    });
+  }
+  function addSaved(text, title, from) {
+    text = (text || '').trim();
+    if (!text) return;
+    db.saved = db.saved || [];
+    db.saved.unshift({
+      id: uid(),
+      text: text,
+      title: (title || '').trim(),
+      link: /^https?:\/\//i.test(text) ? text : '',
+      ts: Date.now(),
+      from: from || 'paste'
+    });
+    save(); renderSaved();
+  }
+  $('#savedAdd').addEventListener('click', function () {
+    var text = $('#savedInput').value.trim();
+    if (!text) { $('#savedInput').focus(); return; }
+    addSaved(text, $('#savedTitle').value);
+    $('#savedInput').value = ''; $('#savedTitle').value = '';
+  });
+  $('#savedInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#savedAdd').click(); }
+  });
+  function handleShared() {
+    try {
+      var q = new URLSearchParams(location.search);
+      var text = (q.get('text') || '').trim();
+      var title = (q.get('title') || '').trim();
+      var url = (q.get('url') || '').trim();
+      var content = text || url || '';
+      if (!content) return;
+      addSaved(content, title, 'share');
+      goTab('tab-saved');
+    } catch (e) {}
+  }
+  renderSaved();
+  handleShared();
 
   /* ═══════ PWA ═══════ */
   if ('serviceWorker' in navigator) {

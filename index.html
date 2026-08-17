@@ -53,6 +53,7 @@
         <button class="side-link" data-tab="tab-ai-vision">🎬 AI Vision</button>
         <button class="side-link" data-tab="tab-avatar">👤 Avatar</button>
         <button class="side-link" data-tab="tab-meditate">◎ Breathe</button>
+        <button class="side-link" data-tab="tab-saved">🔖 Saved</button>
         <button class="side-link" data-tab="tab-more">☰ More</button>
       </nav>
       <div class="ds-foot">
@@ -370,6 +371,21 @@
         </div>
       </section>
 
+      <!-- Saved Inspiration -->
+      <section id="tab-saved" class="tab-page">
+        <h2 class="page-title">Saved Inspiration</h2>
+        <p class="page-sub">One-tap collect anything that inspires you — from any app, in one place.</p>
+        <div class="card glass form-card">
+          <label class="field-label">Paste a link or note</label>
+          <textarea id="savedInput" rows="3" placeholder="Paste a social media link or any inspiring words…" maxlength="500"></textarea>
+          <div class="form-row">
+            <input id="savedTitle" type="text" placeholder="Optional title / tag" maxlength="60">
+            <button id="savedAdd" class="btn-primary btn-small">Save 🔖</button>
+          </div>
+        </div>
+        <div id="savedList" class="list"></div>
+      </section>
+
       <!-- More / Practice Hub -->
       <section id="tab-more" class="tab-page">
         <h2 class="page-title">Your Practice</h2>
@@ -389,6 +405,11 @@
             <span class="mc-ico">👤</span>
             <span class="mc-title">Avatar</span>
             <span class="mc-desc">A guide who speaks to you</span>
+          </div>
+          <div class="more-card" data-goto="tab-saved">
+            <span class="mc-ico">🔖</span>
+            <span class="mc-title">Saved</span>
+            <span class="mc-desc">Collect inspiration</span>
           </div>
           <div class="more-card" data-goto="tab-goals">
             <span class="mc-ico">☆</span>
