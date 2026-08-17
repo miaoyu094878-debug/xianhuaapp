@@ -1194,6 +1194,154 @@
   renderSaved();
   handleShared();
 
+  /* ═══════ Manifest Song (Web Audio, zero cost) ═══════ */
+  var SONG_STYLES = {
+    calm:      { bpm: 72, wave: 'sine',     vol: 0.30, chords: [['C3','G3','E4'],['A2','E3','C4'],['F2','C3','A3'],['G2','D3','B3']] },
+    uplifting: { bpm: 98, wave: 'triangle', vol: 0.26, chords: [['C3','E3','G3'],['G2','B2','D3'],['A2','C3','E3'],['F2','A2','C3']] },
+    dreamy:    { bpm: 62, wave: 'sine',     vol: 0.28, chords: [['A2','E3','C4'],['F2','C3','A3'],['C3','G3','E4'],['G2','D3','B3']] }
+  };
+  var SONG_THEMES = {
+    abundance: { ico: '💎', obj: 'abundance', img: 'golden light', affirms: ['I am worthy of every gift', 'Abundance pours into my days'] },
+    love:      { ico: '💖', obj: 'love', img: 'a warm glow', affirms: ['I am ready to receive love', 'My heart is soft and open'] },
+    career:    { ico: '⭐', obj: 'purpose', img: 'a rising sun', affirms: ['My work is my joy', 'I walk the path of my purpose'] },
+    wellness:  { ico: '🌿', obj: 'health', img: 'morning air', affirms: ['My body is my temple', 'I feel light and whole'] },
+    dream:     { ico: '🌟', obj: 'the life I dream of', img: 'a quiet shore', affirms: ['I am becoming who I am', 'My dream is already true'] }
+  };
+  var songStyle = 'calm';
+  var songLines = [];
+  function songTheme(input) {
+    var t = (input || '').toLowerCase();
+    if (/(money|wealth|rich|abundan|financ|prosper)/.test(t)) return 'abundance';
+    if (/(love|lover|partner|marry|soulmate|heart)/.test(t)) return 'love';
+    if (/(job|career|business|work|success|promot|studio)/.test(t)) return 'career';
+    if (/(health|heal|strong|energ|fit|well|body)/.test(t)) return 'wellness';
+    return 'dream';
+  }
+  function buildLyrics(input, theme) {
+    var th = SONG_THEMES[theme];
+    var dream = (input || 'the life I dream of').replace(/\s+/g, ' ').trim();
+    if (dream.length > 46) dream = dream.slice(0, 46).trim() + '…';
+    return [
+      'Verse 1',
+      'I dream of ' + dream,
+      'A future already mine',
+      'Every morning calls it closer',
+      'Light is tracing every line',
+      'Chorus',
+      'And I feel it now, ' + th.obj,
+      'Rising in my chest',
+      'I am becoming ' + dream,
+      'With every golden breath',
+      'Verse 2',
+      th.affirms[0],
+      'I breathe it in, I let it grow',
+      th.affirms[1],
+      'The universe already knows',
+      'Chorus',
+      'And I feel it now, ' + th.obj,
+      'Rising in my chest',
+      'I am becoming ' + dream,
+      'With every golden breath',
+      'Bridge',
+      'I hold this truth like a flame',
+      'A sky of ' + th.img + ' opens wide',
+      'It was always mine to claim'
+    ];
+  }
+  function renderSongLines() {
+    var wrap = $('#songLyrics');
+    wrap.innerHTML = '';
+    songLines.forEach(function (line) {
+      if (line.section) wrap.appendChild(el('div', 'sl-section', line.section));
+      else wrap.appendChild(el('p', 'sl-line', line.text));
+    });
+    $('#songPlay').classList.remove('hidden');
+    $('#songStop').classList.add('hidden');
+  }
+  function noteFreq(n) {
+    var semis = { C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, 'G#': 8, A: 9, 'A#': 10, B: 11 };
+    var m = n.match(/^([A-G]#?)(\d)$/);
+    if (!m) return 440;
+    var midi = (parseInt(m[2], 10) + 1) * 12 + semis[m[1]];
+    return 440 * Math.pow(2, (midi - 69) / 12);
+  }
+  function playTone(ctx, t0, freq, dur, wave, vol) {
+    var o = ctx.createOscillator(); o.type = wave; o.frequency.value = freq;
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(vol, t0 + 0.12);
+    g.gain.setValueAtTime(vol, t0 + dur * 0.7);
+    g.gain.linearRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t0); o.stop(t0 + dur + 0.05);
+  }
+  var songCtx = null, songTimer = null;
+  function playSong() {
+    if (!songLines.length) return;
+    stopSong();
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) throw new Error('no-audio');
+      var ctx = songCtx = new AC();
+      var st = SONG_STYLES[songStyle] || SONG_STYLES.calm;
+      var beat = 60 / st.bpm;
+      var lineDur = beat * 8;
+      var startT = ctx.currentTime + 0.15;
+      var li = 0;
+      songLines.forEach(function (line) {
+        if (line.section) return;
+        var ch = st.chords[li % st.chords.length];
+        var t0 = startT + li * lineDur;
+        ch.forEach(function (n) { playTone(ctx, t0, noteFreq(n), lineDur * 1.1, st.wave, st.vol); });
+        playTone(ctx, t0, noteFreq(ch[0]) / 2, lineDur, 'sine', st.vol * 0.7);
+        for (var b = 0; b < 4; b++) {
+          playTone(ctx, t0 + b * beat * 2, noteFreq(ch[b % ch.length]) * 2, beat * 1.6, st.wave, st.vol * 0.5);
+        }
+        (function (idx) {
+          setTimeout(function () {
+            $$('#songLyrics .sl-line').forEach(function (p, j) { p.classList.toggle('active', j === idx); });
+            var cur = document.querySelector('#songLyrics .sl-line.active');
+            if (cur && cur.scrollIntoView) cur.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, (startT - ctx.currentTime) * 1000 + idx * lineDur * 1000);
+        })(li);
+        li++;
+      });
+      var total = (startT - ctx.currentTime) * 1000 + songLines.filter(function (l) { return !l.section; }).length * lineDur * 1000;
+      songTimer = setTimeout(function () {
+        $$('#songLyrics .sl-line').forEach(function (p) { p.classList.remove('active'); });
+        $('#songPlay').classList.remove('hidden'); $('#songStop').classList.add('hidden');
+      }, total + 1500);
+      $('#songPlay').classList.add('hidden'); $('#songStop').classList.remove('hidden');
+    } catch (e) {
+      $('#songLyrics').appendChild(el('div', 'meta', 'Playback needs audio support — try a desktop browser.'));
+    }
+  }
+  function stopSong() {
+    if (songTimer) { clearTimeout(songTimer); songTimer = null; }
+    if (songCtx) { try { songCtx.close(); } catch (e) {} songCtx = null; }
+    $$('#songLyrics .sl-line').forEach(function (p) { p.classList.remove('active'); });
+    $('#songPlay').classList.remove('hidden'); $('#songStop').classList.add('hidden');
+  }
+  $('#songGen').addEventListener('click', function () {
+    var input = $('#songInput').value.trim();
+    if (!input) { $('#songInput').focus(); return; }
+    var raw = buildLyrics(input, songTheme(input));
+    songLines = raw.map(function (s) { return /^(Verse|Chorus|Bridge)/.test(s) ? { section: s } : { text: s }; });
+    stopSong();
+    renderSongLines();
+  });
+  $('#songInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#songGen').click(); }
+  });
+  $('#songPlay').addEventListener('click', playSong);
+  $('#songStop').addEventListener('click', stopSong);
+  $$('#songStyles .chip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      songStyle = c.dataset.style;
+      $$('#songStyles .chip').forEach(function (x) { x.classList.toggle('active', x === c); });
+    });
+  });
+
   /* ═══════ PWA ═══════ */
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(function () {});

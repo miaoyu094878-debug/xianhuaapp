@@ -54,6 +54,7 @@
         <button class="side-link" data-tab="tab-avatar">👤 Avatar</button>
         <button class="side-link" data-tab="tab-meditate">◎ Breathe</button>
         <button class="side-link" data-tab="tab-saved">🔖 Saved</button>
+        <button class="side-link" data-tab="tab-song">🎵 Manifest Song</button>
         <button class="side-link" data-tab="tab-more">☰ More</button>
       </nav>
       <div class="ds-foot">
@@ -386,6 +387,27 @@
         <div id="savedList" class="list"></div>
       </section>
 
+      <!-- Manifest Song -->
+      <section id="tab-song" class="tab-page">
+        <h2 class="page-title">Manifest Song</h2>
+        <p class="page-sub">Describe the life you want — hear it become your own song.</p>
+        <div class="card glass form-card">
+          <label class="field-label">Your dream</label>
+          <textarea id="songInput" rows="2" placeholder="e.g. I live by the ocean, free and deeply loved" maxlength="120"></textarea>
+          <button id="songGen" class="btn-primary">Write My Song 🎵</button>
+          <div class="chips" id="songStyles">
+            <button class="chip active" data-style="calm">🌊 Calm</button>
+            <button class="chip" data-style="uplifting">⚡ Uplifting</button>
+            <button class="chip" data-style="dreamy">🌙 Dreamy</button>
+          </div>
+        </div>
+        <div id="songLyrics" class="card glass song-card"></div>
+        <div class="song-controls">
+          <button id="songPlay" class="btn-primary hidden">▶ Play</button>
+          <button id="songStop" class="link-btn hidden">⏹ Stop</button>
+        </div>
+      </section>
+
       <!-- More / Practice Hub -->
       <section id="tab-more" class="tab-page">
         <h2 class="page-title">Your Practice</h2>
@@ -410,6 +432,11 @@
             <span class="mc-ico">🔖</span>
             <span class="mc-title">Saved</span>
             <span class="mc-desc">Collect inspiration</span>
+          </div>
+          <div class="more-card" data-goto="tab-song">
+            <span class="mc-ico">🎵</span>
+            <span class="mc-title">Manifest Song</span>
+            <span class="mc-desc">Hear your dream as music</span>
           </div>
           <div class="more-card" data-goto="tab-goals">
             <span class="mc-ico">☆</span>

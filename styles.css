@@ -844,6 +844,13 @@ html.device-desktop #tab-goals .form-card, html.device-desktop #tab-future .form
 /* Saved inspiration */
 .saved-link { display: block; font-size: 14px; color: var(--accent); text-decoration: underline; word-break: break-all; line-height: 1.5; }
 
+/* Manifest Song */
+.song-card { text-align: center; padding: 28px 22px; min-height: 220px; }
+.sl-section { font-size: 11px; text-transform: uppercase; letter-spacing: 2.5px; color: var(--text-dim); margin: 22px 0 8px; }
+.sl-line { font-family: var(--font-heading); font-style: var(--heading-italic); font-size: 17px; line-height: 1.7; color: var(--text-soft); transition: 0.45s; padding: 4px 0; }
+.sl-line.active { color: var(--accent); font-size: 20px; transform: scale(1.03); }
+.song-controls { display: flex; justify-content: center; align-items: center; gap: 14px; margin-top: 4px; min-height: 46px; }
+
 /* ════════════════════════════════════════════════════════════════
    LIQUID GLASS THEME — Apple iOS 26/27 glassmorphism
    Translucent glass, reflective sheen, blue accent.
