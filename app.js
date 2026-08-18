@@ -825,55 +825,92 @@
     g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)');
     c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
   }
-  function wpStars(c, w, h, n) {
+  // 确定性伪随机：保证每次重绘（含拖拽）星点位置不抖动
+  function wpRand(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+  function wpStars(c, w, h, n, opts) {
+    opts = opts || {};
     for (var i = 0; i < n; i++) {
-      c.fillStyle = 'rgba(255,255,255,' + (Math.random() * 0.7 + 0.25) + ')';
-      c.beginPath(); c.arc(Math.random() * w, Math.random() * h, Math.random() * 2 + 0.5, 0, Math.PI * 2); c.fill();
+      var rx = wpRand(i * 3 + 1), ry = wpRand(i * 3 + 2), rb = wpRand(i * 3 + 3);
+      var x = rx * w, y = ry * h, rad = rb * 1.7 + 0.5, a = rb * 0.55 + 0.28;
+      if (opts.dim) a *= 0.6;
+      c.fillStyle = 'rgba(255,255,255,' + a + ')';
+      c.beginPath(); c.arc(x, y, rad, 0, Math.PI * 2); c.fill();
+      if (opts.spark && rad > 1.7) {
+        c.save(); c.globalAlpha = a * 0.85;
+        c.strokeStyle = 'rgba(255,255,255,0.9)'; c.lineWidth = Math.max(1, rad * 0.45);
+        var s = rad * 4.5;
+        c.beginPath(); c.moveTo(x - s, y); c.lineTo(x + s, y); c.moveTo(x, y - s); c.lineTo(x, y + s); c.stroke();
+        c.restore();
+      }
     }
   }
+  function wpVignette(c, w, h, amt) {
+    var g = c.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.22, w / 2, h / 2, Math.max(w, h) * 0.78);
+    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,' + amt + ')');
+    c.fillStyle = g; c.fillRect(0, 0, w, h);
+  }
   var WP_PRESETS = [
+    // 1 · Aurora Veil 极光纱幔
+    function (c, w, h) {
+      var g = c.createLinearGradient(0, 0, w * 0.4, h);
+      g.addColorStop(0, '#0a0e27'); g.addColorStop(0.55, '#0c1230'); g.addColorStop(1, '#05060f');
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+      wpBlob(c, w * 0.5, h * 0.22, w * 0.85, 'rgba(40,220,180,0.28)');
+      wpBlob(c, w * 0.3, h * 0.34, w * 0.70, 'rgba(90,120,240,0.26)');
+      wpBlob(c, w * 0.72, h * 0.30, w * 0.60, 'rgba(200,90,220,0.24)');
+      wpStars(c, w, h, 90, { dim: true });
+      wpVignette(c, w, h, 0.34);
+    },
+    // 2 · Midnight Bloom 午夜花
+    function (c, w, h) {
+      var g = c.createRadialGradient(w * 0.5, h * 0.45, 0, w * 0.5, h * 0.45, Math.max(w, h) * 0.9);
+      g.addColorStop(0, '#241033'); g.addColorStop(1, '#0a0510');
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+      wpBlob(c, w * 0.72, h * 0.26, w * 0.70, 'rgba(220,90,180,0.40)');
+      wpBlob(c, w * 0.22, h * 0.82, w * 0.60, 'rgba(120,80,225,0.34)');
+      wpStars(c, w, h, 70, { dim: true });
+      wpVignette(c, w, h, 0.30);
+    },
+    // 3 · Cosmic Drift 星河漂流（银河带）
     function (c, w, h) {
       var g = c.createLinearGradient(0, 0, w, h);
-      g.addColorStop(0, '#f3e8ff'); g.addColorStop(0.5, '#ffe3f1'); g.addColorStop(1, '#e8d5ff');
+      g.addColorStop(0, '#070a1c'); g.addColorStop(0.5, '#05070f'); g.addColorStop(1, '#02030a');
       c.fillStyle = g; c.fillRect(0, 0, w, h);
-      wpBlob(c, w * 0.75, h * 0.2, w * 0.6, 'rgba(160,120,230,0.35)');
-      wpBlob(c, w * 0.15, h * 0.8, w * 0.55, 'rgba(240,150,190,0.35)');
+      wpBlob(c, w * 0.20, h * 0.30, w * 0.50, 'rgba(150,170,255,0.18)');
+      wpBlob(c, w * 0.50, h * 0.46, w * 0.55, 'rgba(180,150,240,0.16)');
+      wpBlob(c, w * 0.82, h * 0.62, w * 0.50, 'rgba(120,180,255,0.16)');
+      wpStars(c, w, h, 170, { spark: true });
+      wpVignette(c, w, h, 0.30);
     },
+    // 4 · Ember Glow 余烬暖光
     function (c, w, h) {
-      var g = c.createLinearGradient(0, 0, w, h);
-      g.addColorStop(0, '#0b0014'); g.addColorStop(1, '#1b0b33');
+      var g = c.createRadialGradient(w * 0.3, h * 0.9, 0, w * 0.5, h * 0.6, Math.max(w, h));
+      g.addColorStop(0, '#2a1606'); g.addColorStop(1, '#0a0604');
       c.fillStyle = g; c.fillRect(0, 0, w, h);
-      wpBlob(c, w * 0.7, h * 0.25, w * 0.5, 'rgba(150,110,230,0.4)');
-      wpStars(c, w, h, 130);
+      wpBlob(c, w * 0.28, h * 0.86, w * 0.80, 'rgba(255,150,60,0.34)');
+      wpBlob(c, w * 0.82, h * 0.20, w * 0.50, 'rgba(255,120,90,0.20)');
+      wpStars(c, w, h, 50, { dim: true });
+      wpVignette(c, w, h, 0.42);
     },
+    // 5 · Ocean Depths 深海
     function (c, w, h) {
       var g = c.createLinearGradient(0, h, 0, 0);
-      g.addColorStop(0, '#061c3a'); g.addColorStop(1, '#0a0f2e');
+      g.addColorStop(0, '#021a1e'); g.addColorStop(1, '#01090c');
       c.fillStyle = g; c.fillRect(0, 0, w, h);
-      wpBlob(c, w * 0.3, h * 0.35, w * 0.8, 'rgba(60,220,190,0.30)');
-      wpBlob(c, w * 0.75, h * 0.5, w * 0.6, 'rgba(130,90,230,0.35)');
-      wpStars(c, w, h, 60);
+      wpBlob(c, w * 0.5, h * 0.64, w * 0.95, 'rgba(40,200,210,0.30)');
+      wpBlob(c, w * 0.32, h * 0.30, w * 0.50, 'rgba(60,120,205,0.26)');
+      wpStars(c, w, h, 45, { dim: true });
+      wpVignette(c, w, h, 0.34);
     },
+    // 6 · Rose Quartz Night 玫瑰夜
     function (c, w, h) {
-      var g = c.createLinearGradient(0, 0, 0, h);
-      g.addColorStop(0, '#fff3d6'); g.addColorStop(1, '#ffd9a0');
+      var g = c.createRadialGradient(w * 0.5, h * 0.4, 0, w * 0.5, h * 0.4, Math.max(w, h) * 0.85);
+      g.addColorStop(0, '#1c0712'); g.addColorStop(1, '#0a0308');
       c.fillStyle = g; c.fillRect(0, 0, w, h);
-      wpBlob(c, w * 0.5, h * 0.75, w * 0.7, 'rgba(255,190,120,0.5)');
-    },
-    function (c, w, h) {
-      var g = c.createLinearGradient(0, 0, w, h);
-      g.addColorStop(0, '#eafff6'); g.addColorStop(1, '#d7f5ea');
-      c.fillStyle = g; c.fillRect(0, 0, w, h);
-      wpBlob(c, w * 0.8, h * 0.25, w * 0.5, 'rgba(120,220,190,0.35)');
-      wpBlob(c, w * 0.2, h * 0.8, w * 0.4, 'rgba(190,240,220,0.5)');
-    },
-    function (c, w, h) {
-      var g = c.createLinearGradient(0, 0, w, h);
-      g.addColorStop(0, '#160a26'); g.addColorStop(1, '#3a1030');
-      c.fillStyle = g; c.fillRect(0, 0, w, h);
-      wpBlob(c, w * 0.5, h * 0.6, w * 0.6, 'rgba(255,170,190,0.28)');
-      wpBlob(c, w * 0.25, h * 0.25, w * 0.4, 'rgba(240,190,120,0.25)');
-      wpStars(c, w, h, 90);
+      wpBlob(c, w * 0.5, h * 0.34, w * 0.85, 'rgba(240,150,190,0.30)');
+      wpBlob(c, w * 0.74, h * 0.80, w * 0.50, 'rgba(150,90,205,0.28)');
+      wpStars(c, w, h, 55, { dim: true });
+      wpVignette(c, w, h, 0.30);
     }
   ];
 
