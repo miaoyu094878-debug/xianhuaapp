@@ -624,7 +624,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .wp-size { margin-top: 12px; display: flex; align-items: center; gap: 10px; }
 .wp-size label { font-size: 12px; color: var(--text-soft); min-width: 62px; }
 .wp-size input[type="range"] { flex: 1; accent-color: var(--accent); }
-.wp-canvas { width: 100%; border-radius: 16px; box-shadow: var(--shadow-card); background: #000; margin-bottom: 12px; cursor: grab; touch-action: none; }
+.wp-canvas { width: 100%; height: auto; aspect-ratio: 9 / 16; border-radius: 16px; box-shadow: var(--shadow-card); background: #000; margin-bottom: 12px; cursor: grab; touch-action: none; }
 .wp-canvas.dragging { cursor: grabbing; }
 .wp-pos-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .wp-hint { font-size: 12px; color: var(--text-soft); }

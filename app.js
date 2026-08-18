@@ -1117,7 +1117,9 @@
   var wpImgCache = null, wpImgSrc = null;
   function renderWallpaper() {
     var ratio = WP_RATIOS[wpState.ratio];
-    var cnv = $('#wpCanvas'); cnv.width = ratio.w; cnv.height = ratio.h;
+    var cnv = $('#wpCanvas');
+    cnv.width = ratio.w; cnv.height = ratio.h;
+    cnv.style.aspectRatio = ratio.w + ' / ' + ratio.h;
     var c = cnv.getContext('2d');
     function paint() {
       if (wpState.photo) { if (wpImgCache) drawCover(c, wpImgCache, ratio.w, ratio.h); }
