@@ -959,6 +959,12 @@
       y: (e.clientY - rect.top) / rect.height * ratio.h
     };
   }
+  var WP_SNAP = 0.035; // normalized snap distance to a guide line
+  function wpSnap(v) {
+    var targets = [1 / 3, 0.5, 2 / 3];
+    for (var i = 0; i < targets.length; i++) { if (Math.abs(v - targets[i]) < WP_SNAP) return targets[i]; }
+    return null;
+  }
   function saveWpPos() {
     try { localStorage.setItem('luminara_wp_pos', JSON.stringify({ x: wpState.textNX, y: wpState.textNY })); } catch (e) {}
   }
@@ -985,6 +991,9 @@
     var p = wpCanvasPoint(e);
     var rw = WP_RATIOS[wpState.ratio].w, rh = WP_RATIOS[wpState.ratio].h;
     var nx = (p.x - wpDragOff.x) / rw, ny = (p.y - wpDragOff.y) / rh;
+    var sx = wpSnap(nx), sy = wpSnap(ny);
+    if (sx !== null) nx = sx;
+    if (sy !== null) ny = sy;
     wpState.textNX = Math.max(0.04, Math.min(0.96, nx));
     wpState.textNY = Math.max(0.04, Math.min(0.96, ny));
     renderWallpaper();
@@ -1046,12 +1055,27 @@
     });
     wpState._box = { x: cx - maxW / 2, y: y0, w: maxW, h: total };
     if (wpState._dragging) {
+      wpDrawGuides(c, ratio);
       c.save();
       c.strokeStyle = 'rgba(255,255,255,0.92)'; c.lineWidth = Math.max(3, px * 0.06);
       c.setLineDash([px * 0.28, px * 0.2]);
       c.strokeRect(wpState._box.x - px * 0.3, wpState._box.y - px * 0.3, wpState._box.w + px * 0.6, wpState._box.h + px * 0.6);
       c.restore();
     }
+  }
+  function wpDrawGuides(c, ratio) {
+    var w = ratio.w, h = ratio.h;
+    var xs = [1 / 3, 0.5, 2 / 3], ys = [1 / 3, 0.5, 2 / 3];
+    function line(x1, y1, x2, y2, active) {
+      c.setLineDash([]);
+      c.lineWidth = active ? Math.max(4, w * 0.003) : Math.max(2.5, w * 0.0018);
+      c.strokeStyle = 'rgba(0,0,0,0.32)'; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+      c.strokeStyle = active ? 'rgba(130,240,180,0.98)' : 'rgba(255,255,255,0.55)';
+      c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+    }
+    xs.forEach(function (gx) { line(gx * w, 0, gx * w, h, Math.abs(wpState.textNX - gx) < 0.002); });
+    ys.forEach(function (gy) { line(0, gy * h, w, gy * h, Math.abs(wpState.textNY - gy) < 0.002); });
+    c.setLineDash([]);
   }
   var wpImgCache = null, wpImgSrc = null;
   function renderWallpaper() {
